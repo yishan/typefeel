@@ -61,6 +61,12 @@
 - 「记录」：查看最佳成绩和练习历史。练习结束或重新开始后可打开。
 - 弹窗内按 `Esc` 关闭；使用 `Tab` / `Shift+Tab` 在控件间移动。
 
+## 网页版与开发源码
+
+[字感网页版](https://typefeel.app) 可直接在浏览器中使用。
+
+插件与网页的开发源码统一维护在 [yishan/typefeel](https://github.com/yishan/typefeel)。本仓库提供可直接安装的插件构建产物，功能修改与测试在源码仓库进行。发布包中的 `SOURCE.json` 记录对应的源码提交。
+
 ## 安装
 
 本插件是 DSH 的 bundle，可在插件管理中通过 GitHub 仓库安装：

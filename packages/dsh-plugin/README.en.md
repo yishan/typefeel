@@ -61,6 +61,12 @@ The four sound packs use MIT-licensed recordings from [kbsim](https://github.com
 - **Records**: view personal bests and practice history after finishing or restarting a run.
 - Press `Esc` to close a dialog. Use `Tab` / `Shift+Tab` to move between controls.
 
+## Web app and development source
+
+Use the [Type Feel web app](https://typefeel.app) directly in your browser.
+
+The plugin and web app share development source in [yishan/typefeel](https://github.com/yishan/typefeel). This repository distributes the ready-to-install plugin. Make and test code changes in the source repository. Each release package includes a `SOURCE.json` file identifying its source commit.
+
 ## Installation
 
 This plugin is a DSH bundle. Install it from GitHub in plugin management:

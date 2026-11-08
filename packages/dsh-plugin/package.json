@@ -38,6 +38,7 @@
     "client.pinyin.js",
     "client.jyutping.js",
     "client.audio.js",
+    "SOURCE.json",
     "THIRD_PARTY_NOTICES.md"
   ],
   "dsh": {
