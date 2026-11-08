@@ -6,6 +6,8 @@
 
 A focused typing practice app for English, Mandarin Chinese and Cantonese. Use your own input method. Keep your practice records on your device.
 
+[Start practicing](https://typefeel-seven.vercel.app)
+
 ## Practice
 
 Choose a language and a test, then click the passage or focus it with `Tab`.
