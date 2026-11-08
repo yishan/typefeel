@@ -1,0 +1,64 @@
+{
+  "name": "dsh-typing-practice",
+  "version": "0.1.2",
+  "type": "module",
+  "description": "English, Chinese and Cantonese typing practice in DSH with native IME input, live speed and local best scores.",
+  "license": "MIT",
+  "scripts": {
+    "build": "node ../../scripts/build.mjs --plugin",
+    "test": "node --test ../../tests/*.test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yishan/dsh-typing-practice.git"
+  },
+  "homepage": "https://github.com/yishan/dsh-typing-practice#readme",
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "typing",
+    "typing-test"
+  ],
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "icon.svg",
+    "LICENSE",
+    "README.md",
+    "README.en.md",
+    "client.pinyin.js",
+    "client.jyutping.js",
+    "client.audio.js",
+    "THIRD_PARTY_NOTICES.md"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "slots"
+      ]
+    }
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2",
+    "mdast-util-from-markdown": "2.0.2",
+    "pinyin-pro": "3.29.5",
+    "to-jyutping": "3.1.1"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
+}

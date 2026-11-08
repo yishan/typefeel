@@ -1,0 +1,188 @@
+{
+  "repository": "https://github.com/tplai/kbsim",
+  "revision": "ba103f3b0afa9dab80447aa2e7e2ed80b6bd80e4",
+  "license": "MIT",
+  "author": "Thomas Lai",
+  "files": [
+    {
+      "path": "cream/press/BACKSPACE.mp3",
+      "upstreamPath": "src/assets/audio/cream/press/BACKSPACE.mp3",
+      "bytes": 2506,
+      "sha256": "cb9512dd65874137874469ae3efaddf37ab2a0b1c66815217cc263a9ba201305"
+    },
+    {
+      "path": "cream/press/ENTER.mp3",
+      "upstreamPath": "src/assets/audio/cream/press/ENTER.mp3",
+      "bytes": 2088,
+      "sha256": "78947470c4f3c7577b2df3dacc3d1ec414545b4b7ffe19fd0fe208bf6787aeb1"
+    },
+    {
+      "path": "cream/press/GENERIC_R0.mp3",
+      "upstreamPath": "src/assets/audio/cream/press/GENERIC_R0.mp3",
+      "bytes": 2088,
+      "sha256": "8e3256ddb5a1aed42960a68ba632b3badecce0d60ff3ae61a1ac85e45e343451"
+    },
+    {
+      "path": "cream/press/GENERIC_R1.mp3",
+      "upstreamPath": "src/assets/audio/cream/press/GENERIC_R1.mp3",
+      "bytes": 2088,
+      "sha256": "a45a8f73ce8698705205c80f531e87360737084746b95cb0e47c980e0f86a0b9"
+    },
+    {
+      "path": "cream/press/GENERIC_R2.mp3",
+      "upstreamPath": "src/assets/audio/cream/press/GENERIC_R2.mp3",
+      "bytes": 2088,
+      "sha256": "9a54ada9209a4ecabd38616421de1a495df04bee3f0ec7b5247e2d8a507ac70f"
+    },
+    {
+      "path": "cream/press/GENERIC_R3.mp3",
+      "upstreamPath": "src/assets/audio/cream/press/GENERIC_R3.mp3",
+      "bytes": 2088,
+      "sha256": "b7100272f9a80f7016c10da021e45550f3fcd817c21c172236f6e392881d0c93"
+    },
+    {
+      "path": "cream/press/GENERIC_R4.mp3",
+      "upstreamPath": "src/assets/audio/cream/press/GENERIC_R4.mp3",
+      "bytes": 2088,
+      "sha256": "5472497fae5cd4ca1a70e7861ba990296a708dbd2402a1fab5e1f0f5e8ab92bf"
+    },
+    {
+      "path": "cream/press/SPACE.mp3",
+      "upstreamPath": "src/assets/audio/cream/press/SPACE.mp3",
+      "bytes": 2088,
+      "sha256": "72f7101819fbd08cef4e2623e41e4979a7923ed15f94467796f92612eda4db7b"
+    },
+    {
+      "path": "holypanda/press/BACKSPACE.mp3",
+      "upstreamPath": "src/assets/audio/holypanda/press/BACKSPACE.mp3",
+      "bytes": 2088,
+      "sha256": "293a4fb1ab19605348018c2e8fea805ef9454963aa69e2d26a06ed7217636889"
+    },
+    {
+      "path": "holypanda/press/ENTER.mp3",
+      "upstreamPath": "src/assets/audio/holypanda/press/ENTER.mp3",
+      "bytes": 2088,
+      "sha256": "56d78f9b2b662ddd07255e2e130410536a0e877bdc639fef7e205edfd73558a1"
+    },
+    {
+      "path": "holypanda/press/GENERIC_R0.mp3",
+      "upstreamPath": "src/assets/audio/holypanda/press/GENERIC_R0.mp3",
+      "bytes": 2088,
+      "sha256": "79b2811f3061c406ac9dcf802ae83d68f5fac78f8ed588a515e2550d2fcd05df"
+    },
+    {
+      "path": "holypanda/press/GENERIC_R1.mp3",
+      "upstreamPath": "src/assets/audio/holypanda/press/GENERIC_R1.mp3",
+      "bytes": 2088,
+      "sha256": "cb9aefe55a81c48d6680d2ab8960220c20439e31ba1e32fd570106ed15c7fd40"
+    },
+    {
+      "path": "holypanda/press/GENERIC_R2.mp3",
+      "upstreamPath": "src/assets/audio/holypanda/press/GENERIC_R2.mp3",
+      "bytes": 2088,
+      "sha256": "d346d76ef4c32f09be58556ccce843d7a88199214f9ebfdbf8b95226faf7ba3e"
+    },
+    {
+      "path": "holypanda/press/GENERIC_R3.mp3",
+      "upstreamPath": "src/assets/audio/holypanda/press/GENERIC_R3.mp3",
+      "bytes": 2088,
+      "sha256": "4141524713fc19942166866c093777351f6f122acb9d79c7503981a5b906c7dc"
+    },
+    {
+      "path": "holypanda/press/GENERIC_R4.mp3",
+      "upstreamPath": "src/assets/audio/holypanda/press/GENERIC_R4.mp3",
+      "bytes": 2088,
+      "sha256": "60ac51060cc0f1880016be2dffa05d3e3cf928290df37be998fb081bdf1ea66f"
+    },
+    {
+      "path": "holypanda/press/SPACE.mp3",
+      "upstreamPath": "src/assets/audio/holypanda/press/SPACE.mp3",
+      "bytes": 5850,
+      "sha256": "bcba046d707877095ff2fc6d031091348515f9a6f724ee73c029831d105b71a6"
+    },
+    {
+      "path": "mxblue/press/GENERIC_R0.mp3",
+      "upstreamPath": "src/assets/audio/mxblue/press/GENERIC_R0.mp3",
+      "bytes": 2088,
+      "sha256": "329a2cb041186579180cfd6c367b4680e82677689788210a96461ee43dc47115"
+    },
+    {
+      "path": "mxblue/press/GENERIC_R1.mp3",
+      "upstreamPath": "src/assets/audio/mxblue/press/GENERIC_R1.mp3",
+      "bytes": 2088,
+      "sha256": "01baccca3a0b9a913063241c0eaade18d8fd6263d507fbfc4fdfa3a5a526389a"
+    },
+    {
+      "path": "mxblue/press/GENERIC_R2.mp3",
+      "upstreamPath": "src/assets/audio/mxblue/press/GENERIC_R2.mp3",
+      "bytes": 2088,
+      "sha256": "9460f5ccd67aa5c01a125c26533fdbbcf1ce064bb049534bd7e306695fa845b4"
+    },
+    {
+      "path": "mxblue/press/GENERIC_R3.mp3",
+      "upstreamPath": "src/assets/audio/mxblue/press/GENERIC_R3.mp3",
+      "bytes": 2088,
+      "sha256": "4193733efad92e044c6234811219c63075a7c547b6219fdc1f9c915965ba8269"
+    },
+    {
+      "path": "mxblue/press/GENERIC_R4.mp3",
+      "upstreamPath": "src/assets/audio/mxblue/press/GENERIC_R4.mp3",
+      "bytes": 2088,
+      "sha256": "7a98c842c9f2eb650e4d8878cb9ba08428450b190c257d61d5a7dcfaa052d1b3"
+    },
+    {
+      "path": "mxbrown/press/BACKSPACE.mp3",
+      "upstreamPath": "src/assets/audio/mxbrown/press/BACKSPACE.mp3",
+      "bytes": 2506,
+      "sha256": "8607e53ec586692caee08e61d6fa241fce7c7ef9dac219de92b632b90678a972"
+    },
+    {
+      "path": "mxbrown/press/ENTER.mp3",
+      "upstreamPath": "src/assets/audio/mxbrown/press/ENTER.mp3",
+      "bytes": 2506,
+      "sha256": "870ac91262bf77ae898dad217bf033941634b8b162a2fa4a190416abd7aabfb7"
+    },
+    {
+      "path": "mxbrown/press/GENERIC_R0.mp3",
+      "upstreamPath": "src/assets/audio/mxbrown/press/GENERIC_R0.mp3",
+      "bytes": 2506,
+      "sha256": "3ac7a03472bb63ae34f077b7f50d85adf5f1d4f93565c6c6608b23be7eca10ca"
+    },
+    {
+      "path": "mxbrown/press/GENERIC_R1.mp3",
+      "upstreamPath": "src/assets/audio/mxbrown/press/GENERIC_R1.mp3",
+      "bytes": 2506,
+      "sha256": "9fb249de0ef96cb08602f47b53161338bc90a9d094a9c9b2ca33c513d5ca10a8"
+    },
+    {
+      "path": "mxbrown/press/GENERIC_R2.mp3",
+      "upstreamPath": "src/assets/audio/mxbrown/press/GENERIC_R2.mp3",
+      "bytes": 2506,
+      "sha256": "227363367cf62d93b73994cde9124956aecd8bf44c63167909c1079ceae37688"
+    },
+    {
+      "path": "mxbrown/press/GENERIC_R3.mp3",
+      "upstreamPath": "src/assets/audio/mxbrown/press/GENERIC_R3.mp3",
+      "bytes": 2506,
+      "sha256": "4eebb28d97138a226223532321f0351f993f1d21d804bd0f26af1d7e7f8309ec"
+    },
+    {
+      "path": "mxbrown/press/GENERIC_R4.mp3",
+      "upstreamPath": "src/assets/audio/mxbrown/press/GENERIC_R4.mp3",
+      "bytes": 2506,
+      "sha256": "e4f7f0413ceff5892b130808efee2d50734a72f3babdcb2e238761a749fa99c6"
+    },
+    {
+      "path": "mxbrown/press/SPACE.mp3",
+      "upstreamPath": "src/assets/audio/mxbrown/press/SPACE.mp3",
+      "bytes": 1670,
+      "sha256": "c29e11248a5cbfb845628174803ea240701a63d17770ea006defad2d48263017"
+    },
+    {
+      "path": "LICENSE.md",
+      "upstreamPath": "LICENSE.md",
+      "bytes": 1049,
+      "sha256": "1603fe1e3aa5011bfc8b3810b1cd8a31ce14c128344db4da1a37fc0bfae71c30"
+    }
+  ]
+}

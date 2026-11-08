@@ -1,0 +1,44 @@
+:root {
+  color-scheme: light;
+  --tf-bg-base: #fafafa;
+  --tf-bg-layer-1: #f3f3f5;
+  --tf-bg-layer-2: #fff;
+  --tf-bg-layer-3: #e8e8ec;
+  --tf-border-l1: #e4e4e9;
+  --tf-border-l2: #d2d2da;
+  --tf-label-primary: #202124;
+  --tf-label-secondary: #71717b;
+  --tf-brand-primary: #4d6bfe;
+  --tf-brand-primary-new-colorprimary-new-color: #4d6bfe;
+  --tf-state-error-primary: #c74652;
+  --tf-state-success-primary: #27845e;
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --tf-bg-base: #18191b;
+  --tf-bg-layer-1: #212226;
+  --tf-bg-layer-2: #27282d;
+  --tf-bg-layer-3: #373840;
+  --tf-border-l1: #36373e;
+  --tf-border-l2: #4a4b55;
+  --tf-label-primary: #ececef;
+  --tf-label-secondary: #9697a1;
+  --tf-state-error-primary: #ef7b85;
+  --tf-state-success-primary: #74b89c;
+}
+html, body, #app { height: 100%; min-height: 100%; }
+body { margin: 0; -webkit-font-smoothing: antialiased; background: var(--tf-bg-base); color: var(--tf-label-primary); }
+button, select, input { font: inherit; }
+/* Only the outer shell differs from DSH. Typing geometry comes from the shared UI. */
+#app .tp-page { max-width: 1000px; padding-top: clamp(28px, 5vh, 64px); }
+#app .tp-title { font-size: 23px; }
+#app .tp-brand { flex-basis: 380px; }
+#app .tp-toolbar { justify-content: center; }
+.tf-interface-controls { max-width: 390px; }
+@media (max-width: 720px) {
+  #app .tp-page { padding-top: 24px; }
+  #app .tp-title { font-size: 21px; }
+}
+@media (pointer: coarse) {
+  #app .tp-btn, #app .tp-seg-btn, #app .tp-select select { min-height: 44px; }
+}

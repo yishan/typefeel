@@ -1,0 +1,9 @@
+# typing-practice: a timed typing test page in the DSH sidebar.
+#
+# The Host row provides authenticated selection from recent local conversations.
+# Timing, input and local best scores remain in the Client half.
+# The Client half adds a `sidebar.panellist` entry and its `main` page.
+- insert:
+    - id: typing-practice
+      name: dsh-typing-practice
+      config: {}
