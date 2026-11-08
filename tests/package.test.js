@@ -38,11 +38,12 @@ test('the shipped Host activates and parses local Markdown without node_modules 
     assert.equal(existsSync('node_modules'), false);
     assert.equal(existsSync('src'), false);
     let route;
+    const eventTime = Date.now();
     const engine = {
       async listSessions() { return [{ header: { id: 'package-fixture' } }]; },
       async observeSession() {
         return { header: { id: 'package-fixture' }, events: [{
-          type: 'user/message', seq: 1, time: Date.now(),
+          type: 'user/message', seq: 1, time: eventTime,
           data: { role: 'user', source: { kind: 'user' }, content: [{ type: 'text', text: '**' + text + '**' }] },
         }], [Symbol.dispose]() {} };
       },
