@@ -11,4 +11,7 @@ export const hostTheme = `.tp-root {
   --tf-label-secondary: var(--dsw-alias-label-secondary);
   --tf-state-error-primary: var(--dsw-alias-state-error-primary);
   --tf-state-success-primary: var(--dsw-alias-state-success-primary);
-}`;
+}
+.tp-settings-website { border-top: 0; padding-top: 0; }
+.tp-settings-website a { color: var(--tf-label-primary); text-decoration: underline; text-underline-offset: 3px; }
+`;

@@ -1223,7 +1223,8 @@ export function createPractice(React, platform) {
               h('section', { key: section, className: 'tp-settings-section', 'aria-labelledby': 'tp-settings-' + section },
                 h('h3', { id: 'tp-settings-' + section }, t(section)), render())),
             platform.Settings ? h(platform.Settings, { language: activeLanguage }) : null,
-            h('p', { className: 'tp-settings-note' }, t('settingsLocalTextNote'))));
+            h('p', { className: 'tp-settings-note' }, t('settingsLocalTextNote')),
+            platform.SettingsFooter ? h(platform.SettingsFooter, { language: activeLanguage }) : null));
       }
 
       function changeHints(patch) {
@@ -1242,9 +1243,10 @@ export function createPractice(React, platform) {
 
       function renderAnnotations() {
         // Fixed preview stays available in every language without loading the
-        // Mandarin dictionary. Fixtures verify these two syllables per scheme.
+        // Mandarin dictionary. Each format previews its own example word.
         const isShuangpin = hintPreference.pinyinFormat === 'shuangpin';
-        const preview = !isShuangpin ? ['shuāng', 'pīn'] : hintPreference.pinyinScheme === 'xiaohe' ? ['ul', 'pb'] : ['ud', 'pn'];
+        const previewText = isShuangpin ? '双拼' : '拼音';
+        const preview = !isShuangpin ? ['pīn', 'yīn'] : hintPreference.pinyinScheme === 'xiaohe' ? ['ul', 'pb'] : ['ud', 'pn'];
         return h('div', { className: 'tp-sound-body' },
           h('div', { className: 'tp-pinyin-layout' },
             h('div', { className: 'tp-pinyin-controls' },
@@ -1270,8 +1272,8 @@ export function createPractice(React, platform) {
                 }, SHUANGPIN_SCHEMES.map(scheme => h('option', { key: scheme, value: scheme }, t('scheme_' + scheme)))),
                 h('svg', { className: 'tp-select-chevron', viewBox: '0 0 12 12', fill: 'none', stroke: 'currentColor', strokeWidth: 1.5, strokeLinecap: 'round', strokeLinejoin: 'round', 'aria-hidden': true, focusable: false },
                   h('path', { d: 'M3 4.5 6 7.5 9 4.5' }))))),
-            h('div', { className: 'tp-pinyin-preview', role: 'img', 'aria-label': t('pinyinPreview') + ': 双拼 · ' + preview.join(' ') },
-              ['双', '拼'].map((char, i) => h('ruby', { className: 'tp-ruby', key: char, 'aria-hidden': true }, char,
+            h('div', { className: 'tp-pinyin-preview', role: 'img', 'aria-label': t('pinyinPreview') + ': ' + previewText + ' · ' + preview.join(' ') },
+              [...previewText].map((char, i) => h('ruby', { className: 'tp-ruby', key: char, 'aria-hidden': true }, char,
                 h('rt', { className: isShuangpin ? 'tp-shuangpin' : undefined }, preview[i]))))),
           h('p', { className: 'tp-pinyin-note', id: 'tp-pinyin-note' }, t('pinyinNote')),
           h('div', { className: 'tp-sound-status tp-hint-status', 'data-empty': !hintSaveError },

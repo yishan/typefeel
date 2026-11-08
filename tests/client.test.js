@@ -315,6 +315,7 @@ function mountDefaultClient(locale, initialStorage = {}, failSave = false, loadC
     pinyinScheme(value) { find(node => node.type === 'select' && node.props['aria-label'] === '双拼方案').props.onChange({ currentTarget: { value } }); render(); },
     pinyinControl: () => find(node => node.type === 'select' && node.props['aria-label'] === '双拼方案')?.props,
     pinyinPreview: () => find(node => node.props.className === 'tp-pinyin-preview')?.props['aria-label'],
+    pinyinPreviewText: () => findAll(node => node.type === 'ruby', find(node => node.props.className === 'tp-pinyin-preview')).map(node => node.children[0]).join(''),
     renderedReadings() {
       const board = find(node => typeof node.props.text === 'string');
       return findAll(node => node.type === 'rt', board.type(board.props));
@@ -499,7 +500,7 @@ test('the initial practice language follows DSH and Chinese starts with full Pin
       app.openSettings();
       assert.equal(app.hintControl().value, 'current');
       assert.equal(app.pinyinControl().disabled, true);
-      assert.match(app.pinyinPreview(), /shuāng pīn/);
+      assert.equal(app.pinyinPreview(), '注音预览: 拼音 · pīn yīn');
     }
   }
   const app = mountDefaultClient(fallbackLocale({ active: 'zh' }), {
@@ -1833,16 +1834,22 @@ test('Shuangpin can be preset in English without reloading Mandarin or resetting
   const text = app.board().text;
   app.openSettings();
   assert.equal(app.pinyinControl().disabled, true);
-  assert.match(app.pinyinPreview(), /shuāng pīn/);
+  assert.equal(app.pinyinPreview(), '注音预览: 拼音 · pīn yīn');
+  assert.equal(app.pinyinPreviewText(), '拼音');
   app.pinyinFormat('shuangpin');
   assert.equal(app.pinyinControl().value, 'xiaohe');
   assert.equal(app.pinyinControl().disabled, false);
   assert.match(app.pinyinPreview(), /ul pb/);
+  assert.equal(app.pinyinPreviewText(), '双拼');
   for (const scheme of ['xiaohe', 'ziranma', 'microsoft', 'sogou']) {
     app.pinyinScheme(scheme);
     const expected = pinyinEngine.formatReadings(pinyinEngine.annotate('双拼'), 'shuangpin', scheme).map(t => t.displayReading).join(' ');
     assert.equal(app.pinyinPreview(), '注音预览: 双拼 · ' + expected);
   }
+  app.pinyinFormat('full');
+  assert.equal(app.pinyinPreview(), '注音预览: 拼音 · pīn yīn');
+  assert.equal(app.pinyinPreviewText(), '拼音');
+  app.pinyinFormat('shuangpin');
   app.closeSound(); await app.settle();
   assert.equal(app.finished(), true);
   assert.equal(app.board().text, text);
