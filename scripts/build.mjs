@@ -46,7 +46,8 @@ async function pluginBuild() {
   track(host, 'dsh-host');
   await writeFile(resolve(out, 'index.js'), '// Generated from typefeel; do not edit.\n' + host.outputFiles[0].text);
 
-  const client = await build({ ...browserOptions, entryPoints: ['packages/dsh-plugin/src/client.js'], format: 'cjs', write: false });
+  const client = await build({ ...browserOptions, entryPoints: ['packages/dsh-plugin/src/client.js'],
+    loader: { '.svg': 'dataurl' }, format: 'cjs', write: false });
   track(client, 'dsh-client');
   await writeFile(resolve(out, 'client.js'), `// Generated from typefeel; do not edit.\nwindow.__ModuleLoader__.load({id:'${pluginManifest.name}',factory(require){const module={exports:{}};const exports=module.exports;\n${client.outputFiles[0].text}\nreturn module.exports.createPlugin(require('react'), name => require.async(name));}});\n`);
   for (const name of ['pinyin', 'jyutping', 'audio']) {

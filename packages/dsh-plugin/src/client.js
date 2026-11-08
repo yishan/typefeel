@@ -1,14 +1,15 @@
 import { createPractice } from '../../practice/src/create-practice.js';
 import { dictionaries } from '../../practice/src/copy.js';
 import { hostTheme } from './theme.js';
+import brandIconUrl from '../icon.svg';
 
 export function createPlugin(React, loadChunk) {
   function SettingsFooter({ language }) {
     const zh = language === 'zh';
     return React.createElement('p', { className: 'tp-settings-note tp-settings-website' },
-      zh ? '也可以在浏览器中使用字感。' : 'You can also use Type Feel in your browser. ',
+      zh ? '也可以在浏览器中使用 Typefeel 字感 ' : 'You can also use Typefeel 字感 in your browser: ',
       React.createElement('a', { href: 'https://typefeel.app', target: '_blank', rel: 'noopener noreferrer' },
-        zh ? '打开网页版' : 'Open the web app'));
+        'Typefeel.app'));
   }
 
   return {
@@ -27,6 +28,7 @@ export function createPlugin(React, loadChunk) {
       }
       const { TypingPage, PanelIcon, CSS, t } = createPractice(React, {
         storagePrefix: 'dsh.typing-practice', locale, translate,
+        brandIconUrl,
         SettingsFooter,
         fullShortcuts: true, shortcuts: () => ctx.get('shortcuts'),
         loadPronunciation: name => loadChunk(`./client.${name}.js`),

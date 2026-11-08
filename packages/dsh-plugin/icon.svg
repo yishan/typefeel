@@ -1,12 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-label="Typing practice">
-  <rect width="256" height="256" rx="56" fill="#111827"/>
-  <g stroke="#22d3ee" stroke-width="9" stroke-linecap="round" opacity="0.9">
-    <path d="M52 92h34"/>
-    <path d="M40 120h30"/>
-    <path d="M52 148h34"/>
-  </g>
-  <rect x="86" y="64" width="120" height="128" rx="26" fill="#f5f0e6"/>
-  <rect x="86" y="64" width="120" height="128" rx="26" fill="none" stroke="#d6cebc" stroke-width="4"/>
-  <text x="146" y="159" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="74" font-weight="700" fill="#111827" text-anchor="middle">A</text>
-  <circle cx="196" cy="176" r="9" fill="#22d3ee"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" role="img" aria-labelledby="title desc">
+<title id="title">Aa monospace caret icon</title>
+<desc id="desc">Gray capital A and lowercase a, with a glowing blue insertion caret on an off-white background. Noto Sans Mono Regular glyph outlines.</desc>
+<defs><filter id="wideGlow" x="-500%" y="-70%" width="1100%" height="240%" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="9.6"/></filter><filter id="closeGlow" x="-200%" y="-25%" width="500%" height="150%" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="3.2"/></filter></defs>
+<rect width="128" height="128" fill="#FAFAFA"/>
+<rect x="28" y="34" width="5.8" height="60" rx="2.9" fill="#4D6BFE" opacity="0.22" filter="url(#wideGlow)"/>
+<rect x="28" y="34" width="5.8" height="60" rx="2.9" fill="#4D6BFE" opacity="0.23" filter="url(#closeGlow)"/>
+<g fill="#737482"><path d="M42.660000000000004 81.8 53.79600000000001 47.38399999999999H58.356L69.54 81.8H65.124L61.86 71.288H50.292L47.028000000000006 81.8ZM54.660000000000004 57.224 51.492000000000004 67.448H60.660000000000004L57.492000000000004 57.224Q57.252 56.408 56.82000000000001 54.92Q56.388000000000005 53.431999999999995 56.05200000000001 51.943999999999996Q55.764 53.431999999999995 55.33200000000001 54.92Q54.900000000000006 56.408 54.660000000000004 57.224Z"/><path d="M82.30799999999999 82.28Q78.516 82.28 76.188 80.408Q73.86 78.536 73.86 74.744Q73.86 70.568 76.86 68.50399999999999Q79.86 66.44 85.524 66.29599999999999L91.044 66.152V65.096Q91.044 61.64 89.316 60.367999999999995Q87.588 59.096 84.66 59.096Q82.596 59.096 80.724 59.623999999999995Q78.852 60.152 77.172 61.111999999999995L75.684 57.848Q77.508 56.93599999999999 79.74 56.263999999999996Q81.972 55.592 84.9 55.592Q89.748 55.592 92.364 57.775999999999996Q94.98 59.959999999999994 94.98 64.568V81.8H91.524L91.044 78.24799999999999H90.852Q89.268 80.264 87.20400000000001 81.27199999999999Q85.14 82.28 82.30799999999999 82.28ZM83.028 78.776Q85.188 78.776 87.012 77.984Q88.836 77.192 89.94 75.584Q91.044 73.976 91.044 71.52799999999999V69.22399999999999L86.436 69.368Q81.828 69.512 79.884 70.856Q77.94 72.2 77.94 74.6Q77.94 76.80799999999999 79.332 77.792Q80.724 78.776 83.028 78.776Z"/></g>
+<rect x="28" y="34" width="5.8" height="60" rx="2.9" fill="#4D6BFE"/>
 </svg>

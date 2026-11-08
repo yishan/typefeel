@@ -12,6 +12,8 @@ export const hostTheme = `.tp-root {
   --tf-state-error-primary: var(--dsw-alias-state-error-primary);
   --tf-state-success-primary: var(--dsw-alias-state-success-primary);
 }
+.tp-logo { display: flex; align-items: center; justify-content: center; overflow: hidden; border: 0; }
+.tp-logo img { width: 64px; height: 64px; max-width: none; flex: none; object-fit: contain; }
 .tp-settings-website { border-top: 0; padding-top: 0; }
 .tp-settings-website a { color: var(--tf-label-primary); text-decoration: underline; text-underline-offset: 3px; }
 `;
