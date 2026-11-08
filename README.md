@@ -1,4 +1,4 @@
-<p align="center"><img src="apps/web/public/icon.svg" width="64" height="64" alt="字感"></p>
+<p align="center"><img src="apps/web/public/brand/icons/icon.svg" width="64" height="64" alt="字感"></p>
 
 # 字感 · Type Feel
 
@@ -6,7 +6,7 @@
 
 专注文字与手感的打字练习。支持英文、中文和粤语，使用自己的输入法，练习记录仅存本机。
 
-[开始练习](https://typefeel-seven.vercel.app)
+[开始练习](https://typefeel.app)
 
 ## 开始练习
 

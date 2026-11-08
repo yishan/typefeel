@@ -1,4 +1,4 @@
-<p align="center"><img src="apps/web/public/icon.svg" width="64" height="64" alt="Type Feel"></p>
+<p align="center"><img src="apps/web/public/brand/icons/icon.svg" width="64" height="64" alt="Type Feel"></p>
 
 # Type Feel · 字感
 
@@ -6,7 +6,7 @@
 
 A focused typing practice app for English, Mandarin Chinese and Cantonese. Use your own input method. Keep your practice records on your device.
 
-[Start practicing](https://typefeel-seven.vercel.app)
+[Start practicing](https://typefeel.app)
 
 ## Practice
 

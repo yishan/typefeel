@@ -1,0 +1,37 @@
+[
+  {
+    "file": "favicon-32.svg",
+    "outlined": true,
+    "vector_path_count": 2
+  },
+  {
+    "file": "icon.svg",
+    "outlined": true,
+    "vector_path_count": 2
+  },
+  {
+    "file": "favicon.svg",
+    "outlined": true,
+    "vector_path_count": 2
+  },
+  {
+    "file": "favicon.ico",
+    "size": 16,
+    "matches_separate_PNG": true
+  },
+  {
+    "file": "favicon.ico",
+    "size": 32,
+    "matches_separate_PNG": true
+  },
+  {
+    "file": "favicon.ico",
+    "size": 48,
+    "matches_separate_PNG": true
+  },
+  {
+    "file": "favicon.ico",
+    "size": 64,
+    "matches_separate_PNG": true
+  }
+]

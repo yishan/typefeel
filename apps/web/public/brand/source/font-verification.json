@@ -1,0 +1,29 @@
+{
+  "font": "Noto Sans Mono Regular",
+  "version": "Version 2.006; ttfautohint (v1.8.3) -l 8 -r 50 -G 200 -x 14 -D latn -f none -a qsq -X \"\"",
+  "license": "SIL Open Font License 1.1",
+  "isFixedPitch": 1,
+  "unitsPerEm": 1000,
+  "glyphAdvanceWidths": {
+    "A": 600,
+    "a": 600
+  },
+  "glyphOutlineRendering": true,
+  "colors": {
+    "background": "#FAFAFA",
+    "text": "#737482",
+    "caret": "#4D6BFE"
+  },
+  "sizes": [
+    16,
+    32,
+    48,
+    64,
+    128,
+    180,
+    192,
+    256,
+    512,
+    1024
+  ]
+}

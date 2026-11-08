@@ -1431,7 +1431,10 @@ export function createPractice(React, platform) {
         h('div', { className: 'tp-page' },
           h('header', { className: 'tp-header' },
             h('div', { className: 'tp-brand' },
-              h('div', { className: 'tp-logo', 'aria-hidden': true }, h(PanelIcon, { size: 28, active: true })),
+              h('div', { className: 'tp-logo', 'aria-hidden': true },
+                platform.brandIconUrl
+                  ? h('img', { src: platform.brandIconUrl, width: 32, height: 32, alt: '', draggable: false })
+                  : h(PanelIcon, { size: 28, active: true })),
               h('div', { className: 'tp-brandtext' },
                 h('h1', { className: 'tp-title' }, t('panelTitle')),
                 h('p', { className: 'tp-subtitle' }, t('panelSubtitle'),

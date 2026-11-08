@@ -2,9 +2,20 @@
 export const webOptions = {
   storagePrefix: 'typefeel.practice',
   fullShortcuts: false,
+  brandIconUrl: '/brand/icons/icon.svg',
   copy: {
-    zh: { panelTitle: '字感', settingsLocalTextNote: '练习内容不会上传。设置与成绩只保存在当前浏览器中，你可以安心练习。' },
-    en: { panelTitle: 'Type Feel', settingsLocalTextNote: 'Your practice text stays in your browser. Settings and scores are saved only on this device.' },
+    zh: {
+      panelTitle: '字感',
+      panelSubtitle: '中粤英打字练习，实时统计速度与准确率',
+      corpusFooter: '',
+      settingsLocalTextNote: '练习内容不会上传。设置与成绩只保存在当前浏览器中，你可以安心练习。',
+    },
+    en: {
+      panelTitle: 'Type Feel',
+      panelSubtitle: 'Chinese, Cantonese and English typing practice, with live speed and accuracy.',
+      corpusFooter: '',
+      settingsLocalTextNote: 'Your practice text stays in your browser. Settings and scores are saved only on this device.',
+    },
   },
 };
 
