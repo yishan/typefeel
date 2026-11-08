@@ -6,6 +6,8 @@ The original short passages and their IDs are preserved. Medium versions continu
 
 All prose was written for this project during development with coding-assistant assistance and is distributed under the repository's [MIT license](../LICENSE). No third-party excerpts, downloaded corpora, or user conversations are included. Automated checks are not independent native-language editing.
 
+`game-words.json` is a separate versioned list of 120 common Chinese characters and two-character words for the web game. It is bundled locally. Game targets are selected from this list, without slicing practice prose or reading conversations. Tests validate uniqueness, allowed Han characters and lengths. Spawn rules also prevent visible duplicates and whole-word prefix conflicts.
+
 ## Length policy
 
 English is measured in words. Chinese and Cantonese use visible graphemes, including ordinary punctuation and Latin characters. The shared policy lives in `src/passage-lengths.js` and applies to built-in articles and local-conversation extraction.

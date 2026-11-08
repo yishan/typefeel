@@ -1,6 +1,7 @@
 import * as PracticeCorpus from './practice-text.js';
 import { dictionaries as defaultDictionaries } from './copy.js';
 import { CSS } from './styles.js';
+import { characters, textEdit } from './native-input.js';
 
 // Each mount owns its locale, caches and preferences. Platform services are
 // provided by the web or DSH entry; this module never imports a host runtime.
@@ -72,10 +73,6 @@ export function createPractice(React, platform) {
 
 
 
-    const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
-    function characters(text) {
-      return Array.from(segmenter.segment(text), (part) => part.segment);
-    }
     const RECENT_KEY = `${storagePrefix}.recent.v1`;
     let recentMemory;
     function loadRecent() {
@@ -432,15 +429,8 @@ export function createPractice(React, platform) {
     function reconcileText(session, value, now) {
       session = checkDeadline(session, now);
       if (session.result) return session;
-      const before = characters(session.typed);
-      const after = characters(value).slice(0, session.target.length);
-      let start = 0;
-      while (start < before.length && start < after.length && before[start] === after[start]) start++;
-      let oldEnd = before.length;
-      let newEnd = after.length;
-      while (oldEnd > start && newEnd > start && before[oldEnd - 1] === after[newEnd - 1]) { oldEnd--; newEnd--; }
-      if (start === oldEnd && start === newEnd) return session;
-      const inserted = after.slice(start, newEnd);
+      const { after, start, inserted, changed } = textEdit(session.typed, value, session.target.length);
+      if (!changed) return session;
       const next = {
         ...session,
         typed: after.join(''),
@@ -585,6 +575,8 @@ export function createPractice(React, platform) {
     // ---------- page ----------
 
     function useLocaleVersion() {
+      // The web may unmount practice while another mode changes the locale.
+      activeLanguage = detectLanguage(localeService);
       const [, setVersion] = React.useState(0);
       React.useEffect(() => {
         const service = localeService;
@@ -1442,6 +1434,7 @@ export function createPractice(React, platform) {
                 h('p', { className: 'tp-subtitle' }, t('panelSubtitle'),
                   h('span', { className: 'tp-privacy-note' }, t('corpusFooter')))),
             ),
+            platform.Navigation ? h(platform.Navigation, { disabled: running }) : null,
             h('div', { className: 'tp-header-actions' },
               h('div', { className: 'tp-best', style: { visibility: isPassage ? 'hidden' : 'visible' } },
               isPassage ? t('corpusPassage') : bestForDuration

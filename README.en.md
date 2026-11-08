@@ -23,6 +23,16 @@ Press `Esc` to restart the current passage. Click “New text” to change it. B
 
 Settings include cursor, pronunciation, sound, interface language and light / dark appearance. On first visit the interface follows your browser language (Chinese or English), and appearance follows your system. Your choices are remembered locally.
 
+## Web game preview
+
+This branch adds a Practice / Game switch. Open `http://127.0.0.1:4173/#game` locally to try it.
+
+Chinese characters and words fall from above. Confirm a complete target using your own input method to fire a glowing cursor. You can also confirm a word one character at a time. Each missed target costs one life; five misses end the round. Difficulty increases every 30 seconds of survival.
+
+Pause to switch modes. Leaving the input or hiding the page pauses automatically; choose Continue to resume. Escape restarts outside composition and stays available to the IME during composition. The best score and last 20 round results stay in your browser, separate from practice records. The first game corpus contains 120 Chinese characters and two-character words.
+
+The preview is on `codex/falling-words-game`, awaiting playtesting. It has not been merged into `main` or published to the production website. See the [verification record](docs/verification/2026-11-09-falling-words.md) for coverage and limits.
+
 ## Text and privacy
 
 The app includes **288 original passages**: 96 per language, with 32 short, 32 medium and 32 long passages. Text, pronunciation dictionaries and sounds ship with the app. Practice does not call a model or upload what you type. Settings and statistics stay in your browser; clearing site data also clears them.

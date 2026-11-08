@@ -242,6 +242,7 @@ function mountDefaultClient(locale, initialStorage = {}, failSave = false, loadC
     blurInput() { dom.activeElement = {}; find(node => node.type === 'textarea').props.onBlur(); render(); },
     hide() { dom.hidden = true; listeners.get('visibilitychange')?.(); render(); },
     unmount() { hooks.forEach(hook => hook?.dispose?.()); },
+    remount() { hooks.forEach(hook => hook?.dispose?.()); hooks.length = 0; inputKey = undefined; render(); },
     compose(type, value, data, at) {
       now = at;
       inputElement.value = value;
@@ -2047,6 +2048,16 @@ test('a next-passage shortcut cancels an in-flight local selection without accep
 function mountWeb(storage = {}, locale = { getLocale: () => ({ active: 'zh' }) }) {
   return mountDefaultClient(locale, storage, false, realPronunciation, undefined, undefined, { web: true });
 }
+
+test('web practice remount reads a locale changed while the game had the screen', () => {
+  const locale = fallbackLocale({ active: 'zh' });
+  const app = mountWeb({}, locale);
+  assert.equal(app.title(), '字感');
+  app.unmount();
+  locale.change({ active: 'en' });
+  app.remount();
+  assert.equal(app.title(), 'Type Feel');
+});
 
 test('web starts in the interface language and exposes no local conversation source or DSH shortcuts', async () => {
   const app = mountWeb({ 'typefeel.practice.preferences.v1': JSON.stringify({ source: 'local' }) });
