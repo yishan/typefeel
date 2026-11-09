@@ -1,13 +1,13 @@
 import { CURSOR_GLOW } from '../cursor-style.js';
 
 export const CSS = `
-.tf-game-root { min-height: 0; --tp-cursor-color: var(--tf-brand-primary); }
+.tf-game-root { min-height: 0; }
 .tf-game-root .tp-scroll { overflow-y: auto; scrollbar-gutter: auto; }
-#app .tf-game-page { height: 100%; min-height: 0; gap: 20px; padding-bottom: 16px; }
+.tf-game-root .tf-game-page { height: 100%; min-height: 0; gap: 20px; padding-bottom: 16px; }
 .tf-game-root .tp-header { align-items: center; flex-wrap: nowrap; gap: 12px; }
-#app .tf-game-root .tp-brand { flex: 1 1 auto; min-width: 42px; }
+.tf-game-root .tp-brand { flex: 1 1 auto; min-width: 42px; }
 .tf-game-root .tp-logo { flex: 0 0 42px; aspect-ratio: 1; }
-#app .tf-game-root .tp-logo img { width: 100%; height: 100%; object-fit: contain; }
+.tf-game-root .tp-logo img { width: 100%; height: 100%; object-fit: contain; }
 .tf-game-root .tp-header-actions { flex-wrap: nowrap; gap: 8px; }
 .tf-game-stats { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 12px; padding: 4px 0 8px; font-variant-numeric: tabular-nums; }
 .tf-game-progress { display: flex; gap: 32px; min-width: 0; }
@@ -30,7 +30,7 @@ export const CSS = `
 .tf-game-shot { position: absolute; top: 0; left: 0; height: 18px; transform-origin: center; will-change: transform; }
 .tf-game-emitter { height: 22px; margin: 0 auto 8px; }
 .tf-game-dock { position: relative; flex: none; text-align: center; }
-.tf-game-input { display: block; resize: none; width: min(100%, 340px); height: 45px; margin: 0 auto; border: 0; border-bottom: 1px solid transparent; border-radius: 0; outline: none; background: transparent; padding: 8px 12px; text-align: center; font: inherit; font-size: 20px; line-height: 28px; color: var(--tf-label-primary); caret-color: var(--tf-brand-primary); overflow: hidden; white-space: pre; }
+.tf-game-input { display: block; resize: none; width: min(100%, 340px); height: 45px; margin: 0 auto; border: 0; border-bottom: 1px solid transparent; border-radius: 0; outline: none; background: transparent; padding: 8px 12px; text-align: center; font: inherit; font-size: 20px; line-height: 28px; color: var(--tf-label-primary); caret-color: var(--tp-cursor-color); overflow: hidden; white-space: pre; }
 .tf-game-input::placeholder { color: var(--tf-label-secondary); font-size: 15px; }
 .tf-game-input:focus { border-bottom-color: var(--tf-border-l1); }
 .tf-game-input[aria-invalid="true"] { color: var(--tf-state-error-primary); border-bottom-color: var(--tf-state-error-primary); }
@@ -42,7 +42,7 @@ export const CSS = `
 .tf-game-overlay h2 { margin: 0; font-size: 30px; font-weight: 550; letter-spacing: -.035em; }
 .tf-game-overlay p { margin: 0; max-width: 340px; font-size: 14px; color: var(--tf-label-secondary); line-height: 1.8; }
 .tf-game-overlay .tf-game-countdown { font-size: 64px; font-weight: 400; color: var(--tf-brand-primary); font-family: var(--tp-font-mono); }
-.tf-game-primary { justify-content: center; background: var(--tf-brand-primary); color: #fff; border-color: transparent; min-width: 120px; }
+.tf-game-primary { justify-content: center; background: var(--tf-brand-primary); color: var(--tf-on-brand, #fff); border-color: transparent; min-width: 120px; }
 .tf-game-primary:hover { filter: brightness(1.08); background: var(--tf-brand-primary); }
 .tf-game-result-score { font-size: 50px; line-height: 1; font-weight: 450; color: var(--tf-brand-primary); font-family: var(--tp-font-mono); }
 .tf-game-result-stats { display: flex; justify-content: center; gap: 28px; }
@@ -62,9 +62,9 @@ export const CSS = `
 .tf-game-rules { margin-top: 12px; }
 @keyframes tf-game-hit { to { opacity: 0; filter: blur(3px); } }
 @media (max-width: 600px) {
-  #app .tf-game-page { padding-inline: 20px; gap: 16px; }
+  .tf-game-root .tf-game-page { padding-inline: 20px; gap: 16px; }
   .tf-game-root .tp-brandtext { display: none; }
-  #app .tf-game-root .tp-brand { flex: 0 0 auto; min-width: 32px; }
+  .tf-game-root .tp-brand { flex: 0 0 auto; min-width: 32px; }
   .tf-game-root .tp-logo { width: 32px; height: 32px; flex-basis: 32px; border-radius: 9px; }
   .tf-game-root .tf-mode-switch { margin-inline: auto; }
   .tf-game-root .tf-mode-switch .tp-seg-btn { min-width: 0; padding-inline: 8px; font-size: 12px; }

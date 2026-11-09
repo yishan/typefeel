@@ -6,14 +6,16 @@
 
 | 位置 | 职责 |
 | --- | --- |
-| `packages/practice/src` | 共同输入、计时、判分、视区、记录、注音、音效与样式 |
-| `apps/web` | 网页入口、品牌、浏览器语言与主题，仅 Esc 快捷键 |
-| `packages/dsh-plugin` | DSH 模块、侧栏、语言与主题接入、快捷键、本地对话 |
+| `packages/practice/src` | 共同练习与游戏、输入、计时、判分、视区、记录、注音、音效与样式 |
+| `apps/web` | 网页入口、品牌、浏览器语言与主题、模式导航 |
+| `packages/dsh-plugin` | DSH 模块、侧栏、语言与主题接入、快捷键、面板布局、本地对话 |
 | `data` / `assets` | 三语原创语料、经过校验的键盘录音与许可 |
 
 `createPractice(React, platform)` 每次调用创建独立的缓存与界面实例。
 平台提供存储前缀、语言、注音和音效加载方式，以及可选的本地语料接口。
 DSH 使用宿主 React；网页将 React 随站点打包。共享模块不引用 DSH 全局对象。
+
+`createGamePage(React, platform)` 复用游戏规则和界面。平台传入品牌资源、游戏记录与音效存储键、布局方式，以及可选的宿主快捷键服务。DSH 游戏与 DSH 练习复用键盘设置；网页保留独立的设置和记录。
 
 ## 验证
 
@@ -56,4 +58,4 @@ GitHub 安装仍应直接使用自包含产物，不要求安装者构建或具�
 不要在生成的 `client.js`、`index.js` 或注音、音效 chunk 中手工修补逻辑。
 网页与插件可以独立发布，不做双向 Git 自动合并。
 
-首次独立网页交付会准备插件 0.1.2 的构建产物；是否发布该 npm 版本是独立的发布步骤。
+GitHub Release 与 npm 使用同一份经过审阅的打包产物。发布后核对 GitHub tag、`SOURCE.json`、npm 版本与 `latest`，并比较下载产物的完整性。

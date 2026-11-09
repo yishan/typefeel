@@ -3,25 +3,26 @@ import { createGameEffects } from './effects.js';
 
 export const GAME_AUDIO_KEY = 'typefeel.game.audio.v1';
 export const KEYBOARD_AUDIO_KEY = 'typefeel.practice.sound.v1';
+const defaultKeys = { effects: GAME_AUDIO_KEY, keyboard: KEYBOARD_AUDIO_KEY };
 export const KEYBOARD_PACKS = SOUND_PACKS.filter(pack => pack !== 'off');
 const volume = (value, fallback) => Number.isFinite(value) ? Math.max(0, Math.min(100, Math.round(value))) : fallback;
 function read(storage, key) { try { return JSON.parse(storage.getItem(key) || 'null'); } catch { return null; } }
 
-export function loadGameAudioPreferences(storage) {
-  const saved = read(storage, GAME_AUDIO_KEY);
+export function loadGameAudioPreferences(storage, keys = defaultKeys) {
+  const saved = read(storage, keys.effects);
   const game = saved?.version === 1 ? saved : {};
-  const keyboard = soundPreference(read(storage, KEYBOARD_AUDIO_KEY));
+  const keyboard = soundPreference(read(storage, keys.keyboard));
   return { effects: { enabled: typeof game.effects?.enabled === 'boolean' ? game.effects.enabled : true, volume: volume(game.effects?.volume, 35) },
     keyboard: { enabled: keyboard.pack !== 'off', pack: keyboard.pack !== 'off' ? keyboard.pack : KEYBOARD_PACKS.includes(game.keyboardPack) ? game.keyboardPack : 'mxblue', volume: keyboard.volume } };
 }
 
-export function saveGameAudioPreferences(storage, preferences, group) {
+export function saveGameAudioPreferences(storage, preferences, group, keys = defaultKeys) {
   try {
-    const saved = read(storage, GAME_AUDIO_KEY);
+    const saved = read(storage, keys.effects);
     if (group === 'keyboard') {
-      storage.setItem(KEYBOARD_AUDIO_KEY, JSON.stringify({ version: 1, pack: preferences.keyboard.enabled ? preferences.keyboard.pack : 'off', volume: preferences.keyboard.volume }));
+      storage.setItem(keys.keyboard, JSON.stringify({ version: 1, pack: preferences.keyboard.enabled ? preferences.keyboard.pack : 'off', volume: preferences.keyboard.volume }));
     }
-    storage.setItem(GAME_AUDIO_KEY, JSON.stringify({ version: 1,
+    storage.setItem(keys.effects, JSON.stringify({ version: 1,
       effects: group === 'effects' ? preferences.effects : saved?.effects || preferences.effects,
       keyboardPack: group === 'keyboard' ? preferences.keyboard.pack : saved?.keyboardPack || preferences.keyboard.pack }));
     return true;

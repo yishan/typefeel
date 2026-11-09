@@ -47,6 +47,8 @@
 
 网页与 [dsh-typing-practice](https://github.com/yishan/dsh-typing-practice) 共用练习源码。插件继续使用原有仓库和 npm 包安装，保留 DSH 本地对话语料及平台快捷键。
 
+插件从 0.2.0 起提供相同的「练习 / 游戏」切换。游戏按 DSH 面板尺寸布局，语言和主题跟随宿主，键盘声音与插件内练习同步，游戏记录独立保存。详见[插件说明](packages/dsh-plugin/README.md)。
+
 ## 本地运行
 
 需要 Node.js 22.12 或更新版本。

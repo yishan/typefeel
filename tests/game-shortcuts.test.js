@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { handleGamePauseShortcut } from '../packages/practice/src/game/shortcuts.js';
+import * as gameShortcuts from '../packages/practice/src/game/shortcuts.js';
+const { handleGamePauseShortcut } = gameShortcuts;
 
 function shortcut(input, overrides = {}) {
   let prevented = false;
@@ -44,4 +45,17 @@ test('extra modifiers and unrelated keys do not become game shortcuts', () => {
     { key: 'p', metaKey: true, altKey: true }, { key: 'p', ctrlKey: true, metaKey: true }, { key: 'r', ctrlKey: true }]) {
     assert.equal(shortcut(input).handled, false);
   }
+});
+
+test('DSH reserves its native pause chord and returns a cleanup that restores the host binding', () => {
+  assert.equal(typeof gameShortcuts.reserveGamePauseShortcut, 'function');
+  for (const apple of [false, true]) {
+    let command; let released = 0;
+    const cleanup = gameShortcuts.reserveGamePauseShortcut({ registerFixed(value) { command = value; return () => released++; } }, apple, '暂停');
+    assert.equal(command.id, 'typing-practice.game.pause');
+    assert.deepEqual(command.bindings, [{ code: 'KeyP', modifiers: [apple ? 'meta' : 'control'] }]);
+    assert.equal(command.label(), '暂停');
+    cleanup(); assert.equal(released, 1);
+  }
+  assert.doesNotThrow(() => gameShortcuts.reserveGamePauseShortcut(undefined, false, 'Pause')?.());
 });

@@ -1,8 +1,8 @@
 {
   "name": "dsh-typing-practice",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "type": "module",
-  "description": "English, Chinese and Cantonese typing practice in DSH with native IME input, live speed and local best scores.",
+  "description": "Typing practice and a falling words game in DSH with native IME input, keyboard sounds and local scores.",
   "license": "MIT",
   "scripts": {
     "build": "node ../../scripts/build.mjs --plugin",
@@ -48,7 +48,8 @@
     "client": {
       "platform": "web",
       "inject": [
-        "slots"
+        "slots",
+        "locale"
       ]
     }
   },

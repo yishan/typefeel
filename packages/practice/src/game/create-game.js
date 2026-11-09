@@ -1,7 +1,7 @@
 import { createGameEngine, SHOT_MS } from './engine.js';
 import { createCommittedBuffer } from '../native-input.js';
 import { loadGameRecords, saveGameResult } from './records.js';
-import { handleGamePauseShortcut } from './shortcuts.js';
+import { handleGamePauseShortcut, reserveGamePauseShortcut } from './shortcuts.js';
 import { createGameAudio, loadGameAudioPreferences, saveGameAudioPreferences, KEYBOARD_PACKS } from './audio.js';
 import { dictionaries } from '../copy.js';
 export { CSS } from './styles.js';
@@ -31,7 +31,7 @@ const copy = {
     saveError: 'This score could not be saved in your browser.', switchHint: 'Pause to switch modes', seconds: 's' },
 };
 
-export function createGamePage(React) {
+export function createGamePage(React, platform = {}) {
   const h = React.createElement;
   return function GamePage({ language = 'zh', storage, Navigation, Settings, loadAudio }) {
     const t = copy[language] || copy.zh;
@@ -42,11 +42,11 @@ export function createGamePage(React) {
     const [round, setRound] = React.useState(0);
     const [view, setView] = React.useState(() => ({ ...engine.state }));
     const [composing, setComposing] = React.useState(false);
-    const [records, setRecords] = React.useState(() => ({ ...loadGameRecords(storage), saved: true }));
+    const [records, setRecords] = React.useState(() => ({ ...loadGameRecords(storage, platform.recordsKey), saved: true }));
     const [settingsOpen, setSettingsOpen] = React.useState(false);
     const [compact, setCompact] = React.useState(false);
     const [missFlash, setMissFlash] = React.useState(false);
-    const [audioPreferences, setAudioPreferences] = React.useState(() => loadGameAudioPreferences(storage));
+    const [audioPreferences, setAudioPreferences] = React.useState(() => loadGameAudioPreferences(storage, platform.audioKeys));
     const audioPreferencesRef = React.useRef(audioPreferences);
     const [audioStatus, setAudioStatus] = React.useState({ effects: 'idle', keyboard: 'idle' });
     const [audioSaveError, setAudioSaveError] = React.useState(false);
@@ -74,7 +74,7 @@ export function createGamePage(React) {
       setView({ ...current.state, targets: current.state.targets.map(target => ({ ...target })), shots: [...current.state.shots] });
       if (current.state.status === 'ended' && savedEngine.current !== current) {
         savedEngine.current = current;
-        setRecords(saveGameResult(storage, current.state));
+        setRecords(saveGameResult(storage, current.state, platform.recordsKey));
       }
     }
     syncRef.current = refresh;
@@ -117,7 +117,7 @@ export function createGamePage(React) {
       const next = { ...previous, [group]: { ...previous[group], ...patch } };
       audioPreferencesRef.current = next; setAudioPreferences(next);
       audioRef.current.configure(next);
-      setAudioSaveError(!saveGameAudioPreferences(storage, next, group));
+      setAudioSaveError(!saveGameAudioPreferences(storage, next, group, platform.audioKeys));
       void audioRef.current.prepare();
     }
     function closeSettings() { audioRef.current.stop(); setSettingsOpen(false); }
@@ -182,8 +182,9 @@ export function createGamePage(React) {
     React.useEffect(() => {
       function layout() {
         const viewport = window.visualViewport;
-        const height = viewport?.height || window.innerHeight;
-        if (rootRef.current) rootRef.current.style.height = `${height}px`;
+        const root = rootRef.current;
+        const height = platform.layout === 'container' ? root?.clientHeight || 0 : viewport?.height || window.innerHeight;
+        if (root && platform.layout !== 'container') root.style.height = `${height}px`;
         setCompact(height < 600);
         const width = stageRef.current?.clientWidth || window.innerWidth;
         const previous = layoutRef.current;
@@ -202,11 +203,15 @@ export function createGamePage(React) {
       function hidden() { if (document.hidden) { audioRef.current.stop(); engineRef.current.pause(performance.now()); syncRef.current(); } }
       function blur() { audioRef.current.stop(); engineRef.current.pause(performance.now()); syncRef.current(); }
       layout();
+      const observer = platform.layout === 'container' && typeof ResizeObserver === 'function' ? new ResizeObserver(layout) : null;
+      if (rootRef.current) observer?.observe(rootRef.current);
+      if (stageRef.current) observer?.observe(stageRef.current);
       window.addEventListener('resize', layout);
       window.visualViewport?.addEventListener('resize', layout);
       document.addEventListener('visibilitychange', hidden);
       window.addEventListener('blur', blur);
       return () => {
+        observer?.disconnect();
         window.removeEventListener('resize', layout);
         window.visualViewport?.removeEventListener('resize', layout);
         document.removeEventListener('visibilitychange', hidden);
@@ -219,10 +224,11 @@ export function createGamePage(React) {
       inside: Boolean(rootRef.current?.contains(document.activeElement)), dialogOpen: settingsOpen, pause,
     });
     React.useEffect(() => {
+      const release = reserveGamePauseShortcut(platform.shortcuts?.(), /Mac|iPhone|iPad/.test(window.navigator?.platform || ''), t.pause);
       const keydown = event => keyboardRef.current(event);
       window.addEventListener('keydown', keydown, true);
-      return () => window.removeEventListener('keydown', keydown, true);
-    }, []);
+      return () => { window.removeEventListener('keydown', keydown, true); release?.(); };
+    }, [language]);
     React.useEffect(() => {
       if (view.status === 'ended' && !composing) restartRef.current?.focus({ preventScroll: true });
     }, [view.status, composing]);
@@ -270,18 +276,18 @@ export function createGamePage(React) {
               primary(t.restart, restart, restartRef), !records.saved ? h('p', { key: 'save', role: 'status' }, t.saveError) : null]
             : null;
 
-    return h('div', { className: 'tp-root tf-game-root', ref: rootRef, 'data-status': view.status, 'data-compact': String(compact) },
+    return h('div', { className: 'tp-root tf-game-root', ref: rootRef, 'data-platform': platform.id, 'data-status': view.status, 'data-compact': String(compact) },
       h('div', { className: 'tp-scroll' }, h('div', { className: 'tp-page tf-game-page' },
         h('header', { className: 'tp-header' },
           h('div', { className: 'tp-brand' },
-            h('span', { className: 'tp-logo', 'aria-hidden': true }, h('img', { src: '/brand/icons/icon.svg', alt: '' })),
+            h('span', { className: 'tp-logo', 'aria-hidden': true }, h('img', { src: platform.brandIconUrl || '/brand/icons/icon.svg', alt: '' })),
             h('div', { className: 'tp-brandtext' }, h('h1', { className: 'tp-title' }, t.title), h('p', { className: 'tp-subtitle' }, t.subtitle))),
           Navigation ? h(Navigation, { disabled: live || composing, title: t.switchHint }) : null,
           h('div', { className: 'tp-header-actions' },
             h('button', { className: 'tp-btn tp-quiet', type: 'button', disabled: !live || composing,
               'aria-keyshortcuts': 'Escape Control+P Meta+P', onPointerDown: guardPointer, onClick: pause }, t.pause),
-            Settings ? h('button', { className: 'tp-btn tp-quiet', type: 'button', disabled: composing, onPointerDown: guardPointer,
-              onClick: () => { pause(); setSettingsOpen(true); void audioRef.current.prepare(); } }, t.settings) : null)),
+            h('button', { className: 'tp-btn tp-quiet', type: 'button', disabled: composing, onPointerDown: guardPointer,
+              onClick: () => { pause(); setSettingsOpen(true); void audioRef.current.prepare(); } }, t.settings))),
         h('div', { className: 'tf-game-stats', role: 'group', 'aria-label': language === 'zh' ? '游戏统计' : 'Game statistics' },
           h('div', { className: 'tf-game-progress' }, stat(t.level, view.level), stat(t.combo, view.combo)),
           h('div', { className: 'tf-game-stat tf-game-health', 'aria-live': 'polite' }, h('span', { className: 'tf-game-stat-label' }, t.lives),
@@ -323,7 +329,7 @@ export function createGamePage(React) {
           h('p', { className: 'tf-game-hint', id: 'tf-game-input-error', 'data-error': String(view.error && !composing), role: 'status' }, view.error && !composing ? t.error : '')),
         h('footer', { className: 'tf-game-footer' }, h('span', { id: 'tf-game-input-hint' }, t.hint), h('span', { className: 'tf-game-summary' }, `${t.best} ${records.best} · ${Math.floor(view.time / 1000)}${language === 'zh' ? ' 秒' : 's'}`)),
       )),
-      Settings ? h('dialog', { className: 'tf-game-settings', ref: dialogRef, 'aria-label': t.settings, onCancel: closeSettings, onClose: closeSettings },
+      h('dialog', { className: 'tf-game-settings', ref: dialogRef, 'aria-label': t.settings, onCancel: closeSettings, onClose: closeSettings },
         h('div', { className: 'tf-game-settings-header' }, h('h2', null, t.settings),
           h('button', { className: 'tp-btn tp-quiet', type: 'button', 'aria-label': t.close, onClick: closeSettings },
             h('svg', { viewBox: '0 0 24 24', width: 18, height: 18, fill: 'none', stroke: 'currentColor', strokeWidth: 1.8, 'aria-hidden': true }, h('path', { d: 'M5 5 19 19M19 5 5 19' })))),
@@ -331,9 +337,9 @@ export function createGamePage(React) {
         h('p', { className: 'tf-game-audio-status', role: 'status' }, audioSaveError ? t.audioSaveError
           : audioPreferences.keyboard.enabled && audioStatus.keyboard === 'error' || audioPreferences.effects.enabled && audioStatus.effects === 'error' ? t.audioError
             : audioPreferences.keyboard.enabled && audioStatus.keyboard === 'loading' ? t.audioLoading : ''),
-        h(Settings, { language }),
+        Settings ? h(Settings, { language }) : null,
         h('section', { className: 'tp-settings-section tf-game-rules', 'aria-labelledby': 'tf-game-rules-title' },
           h('h3', { id: 'tf-game-rules-title' }, t.gameplay),
-          h('p', null, t.gameplayHint), h('p', null, t.matchingHint), h('p', null, t.pauseHint), h('p', null, t.levelHint))) : null);
+          h('p', null, t.gameplayHint), h('p', null, t.matchingHint), h('p', null, t.pauseHint), h('p', null, t.levelHint))));
   };
 }

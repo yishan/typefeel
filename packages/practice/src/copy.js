@@ -1,7 +1,7 @@
     const zh = {
       panelLabel: '打字练习',
       panelTitle: '打字练习',
-      panelSubtitle: '实时统计速度与准确率，',
+      panelSubtitle: '实时统计打字速度与准确率',
       bestValue: '最佳 {speed} {unit} · {acc}%',
       legacyBestValue: '旧版最佳 {speed} WPM · {acc}%',
       bestNone: '暂无最佳记录',
@@ -54,7 +54,7 @@
       corpusEmpty: '本次未找到合适的近期语料，已使用默认语料。',
       corpusUnavailable: '本地对话暂不可用，已使用默认语料。',
       corpusPassage: '完成一段', corpusElapsed: '用时', corpusCompleted: '已完成 · {seconds} 秒',
-      corpusCount: '{n} 字符', corpusFooter: '练习记录仅存本机，不保存语料信息。',
+      corpusCount: '{n} 字符', corpusFooter: '',
       records: '记录', recordsTitle: '练习记录', recordsClose: '关闭记录',
       recordsRunning: '完成或重新开始后可查看记录', recordsRecent: '最近练习', recordsBest: '限时最佳',
       recordsAll: '全部语言', recordsLanguage: '记录语言', recordsEmpty: '完成一轮练习后，成绩会出现在这里。',

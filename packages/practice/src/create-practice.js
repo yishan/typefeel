@@ -1412,7 +1412,7 @@ export function createPractice(React, platform) {
       const isPassage = session.mode === 'passage';
       const running = session.startAt != null && !result || composition.active;
 
-      return h('div', { className: 'tp-root' + (isIme ? ' tp-ime' : '') + (session.hints !== 'off' ? ' tp-annotated' : ''),
+      return h('div', { className: 'tp-root' + (isIme ? ' tp-ime' : '') + (session.hints !== 'off' ? ' tp-annotated' : ''), 'data-platform': platform.id,
         ref: rootRef,
         'data-cursor-shape': cursorPreference.shape, 'data-cursor-glow': String(cursorPreference.glow), 'data-cursor-blink': String(cursorPreference.blink) },
         h('div', { className: 'tp-toast-layer', role: 'status', 'aria-live': 'polite', 'aria-atomic': true },

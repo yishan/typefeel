@@ -37,6 +37,22 @@ test('audio preferences tolerate corrupt values and report storage failures', ()
   assert.equal(saveGameAudioPreferences(broken, preferences(), 'effects'), false);
 });
 
+test('DSH game shares the existing DSH keyboard preference without writing web keys', () => {
+  const keys = { effects: 'dsh.typing-practice.game.audio.v1', keyboard: 'dsh.typing-practice.sound.v1' };
+  const storage = store([[keys.keyboard, JSON.stringify({ version: 1, pack: 'holypanda', volume: 55 })],
+    [KEYBOARD_AUDIO_KEY, 'web-keyboard'], [GAME_AUDIO_KEY, 'web-effects']]);
+  const pref = loadGameAudioPreferences(storage, keys);
+  assert.deepEqual(pref.keyboard, { enabled: true, pack: 'holypanda', volume: 55 });
+  pref.keyboard.volume = 70;
+  saveGameAudioPreferences(storage, pref, 'keyboard', keys);
+  assert.equal(JSON.parse(storage.getItem(keys.keyboard)).volume, 70);
+  pref.effects = { enabled: false, volume: 15 };
+  saveGameAudioPreferences(storage, pref, 'effects', keys);
+  assert.deepEqual(loadGameAudioPreferences(storage, keys).effects, pref.effects);
+  assert.equal(storage.getItem(KEYBOARD_AUDIO_KEY), 'web-keyboard');
+  assert.equal(storage.getItem(GAME_AUDIO_KEY), 'web-effects');
+});
+
 test('hits and landings produce distinct cues once per event, without replay after pause', async () => {
   const harness = audioHarness();
   const audio = createGameAudio({ AudioContext: harness.AudioContext, loadAudio: async () => module, preferences: preferences() });

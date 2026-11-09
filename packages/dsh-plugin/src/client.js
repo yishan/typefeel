@@ -1,5 +1,7 @@
 import { createPractice } from '../../practice/src/create-practice.js';
 import { dictionaries } from '../../practice/src/copy.js';
+import { createModeNavigation } from '../../practice/src/mode-navigation.js';
+import { createGamePage, CSS as gameCSS } from '../../practice/src/game/create-game.js';
 import { hostTheme } from './theme.js';
 import brandIconUrl from '../icon.svg';
 
@@ -13,11 +15,12 @@ export function createPlugin(React, loadChunk) {
   }
 
   return {
-    inject: ['slots'],
+    inject: ['slots', 'locale'],
     apply(ctx) {
       const slots = ctx.get('slots');
       if (!slots) return;
       const locale = ctx.get('locale');
+      const { Context: ModeContext, Navigation } = createModeNavigation(React);
       let translate;
       if (locale) {
         try {
@@ -27,6 +30,7 @@ export function createPlugin(React, loadChunk) {
         try { translate = locale.bind('typing-practice'); } catch { /* Optional host service. */ }
       }
       const { TypingPage, PanelIcon, CSS, t } = createPractice(React, {
+        id: 'dsh', Navigation,
         storagePrefix: 'dsh.typing-practice', locale, translate,
         brandIconUrl,
         SettingsFooter,
@@ -41,10 +45,37 @@ export function createPlugin(React, loadChunk) {
           return response.json();
         },
       });
+      const GamePage = createGamePage(React, {
+        id: 'dsh', layout: 'container', brandIconUrl,
+        recordsKey: 'dsh.typing-practice.game.records.v1',
+        audioKeys: { effects: 'dsh.typing-practice.game.audio.v1', keyboard: 'dsh.typing-practice.sound.v1' },
+        shortcuts: () => ctx.get('shortcuts'),
+      });
+      let storage;
+      try { storage = window.localStorage; } catch { /* Shared storage functions handle unavailable storage. */ }
+      function activeLanguage() {
+        try {
+          const snapshot = locale?.getLocale?.();
+          return String(snapshot?.active || snapshot?.id || snapshot?.locale || snapshot?.current || '').toLowerCase().startsWith('en') ? 'en' : 'zh';
+        } catch { return 'zh'; }
+      }
+      function TypefeelPage() {
+        const [mode, setMode] = React.useState('practice');
+        const [language, setLanguage] = React.useState(activeLanguage);
+        React.useEffect(() => {
+          try {
+            const dispose = locale?.subscribe?.(() => setLanguage(activeLanguage()));
+            return typeof dispose === 'function' ? dispose : undefined;
+          } catch { /* Keep the bundled language if an optional locale service fails. */ }
+        }, []);
+        return React.createElement(ModeContext.Provider, { value: { mode, setMode, language } },
+          mode === 'game' ? React.createElement(GamePage, { language, storage, Navigation,
+            loadAudio: () => loadChunk('./client.audio.js') }) : React.createElement(TypingPage));
+      }
       ctx.effect(() => {
         const style = document.createElement('style');
         style.setAttribute('data-typing-practice-style', '');
-        style.textContent = CSS + hostTheme;
+        style.textContent = CSS + gameCSS + hostTheme;
         document.head.appendChild(style);
         return () => style.remove();
       });
@@ -52,7 +83,7 @@ export function createPlugin(React, loadChunk) {
         name: 'sidebar.panellist', id: 'typing-practice', order: 15,
         label: () => t('panelLabel'), locale: 'typing-practice',
       }, PanelIcon));
-      slots.inject('main', () => slots.register({ name: 'main', key: 'typing-practice' }, TypingPage));
+      slots.inject('main', () => slots.register({ name: 'main', key: 'typing-practice' }, TypefeelPage));
     },
   };
 }
