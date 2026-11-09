@@ -51,6 +51,8 @@ function mountDefaultClient(locale, initialStorage = {}, failSave = false, loadC
   const rootElement = { contains: target => target === inputElement || target?.practice === true };
   const audioLoads = [];
   const React = {
+    createContext(initial) { const context = { value: initial }; context.Provider = { context }; return context; },
+    useContext(context) { return context.value; },
     createElement: (type, props, ...children) => ({ type, props: props || {}, children }),
     memo: (component) => component,
     useState(initial) {
@@ -139,6 +141,12 @@ function mountDefaultClient(locale, initialStorage = {}, failSave = false, loadC
       pendingEffects = [];
       dirty = false;
       tree = Page();
+      // The plugin shell chooses a mode before rendering the existing practice
+      // component. This harness exercises practice; browser tests cover switching.
+      while (tree.type?.context || typeof tree.type === 'function') {
+        if (tree.type?.context) { tree.type.context.value = tree.props.value; tree = tree.children[0]; }
+        else tree = tree.type(tree.props);
+      }
       if (tree.props.ref) tree.props.ref.current = rootElement;
       const input = find((node) => node.type === 'textarea');
       if (inputKey !== input.props.key) {

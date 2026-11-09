@@ -19,6 +19,11 @@ test('the package, Cordis entry and every Client chunk share the published modul
       window: { __ModuleLoader__: { load(value) { registration = value; } } },
     });
     assert.equal(registration.id, manifest.name, file);
+    if (file === 'client.js') {
+      const plugin = registration.factory(() => ({}));
+      assert.deepEqual(Array.from(plugin.inject), manifest.dsh.client.inject);
+      assert.ok(plugin.inject.includes('locale'), 'translated pages must wait for the host locale service');
+    }
   }
 });
 

@@ -17,6 +17,7 @@ A typing practice plugin for the [DeepSeek Harness](https://github.com/deepseek-
 | Languages | English, Simplified Chinese and Cantonese in Traditional Chinese, independent of the interface language |
 | Text sources | 96 original passages per language, or excerpts from local conversations within the past 30 days |
 | Practice modes | Timed runs of 15, 30 or 60 seconds, or complete short, medium or long passages |
+| Game | Falling Chinese characters and words; confirm a complete target to fire a glowing cursor |
 | Input | Use your own input method, with optional Pinyin or Jyutping hints for Chinese and Cantonese |
 | Live feedback | An immersive text area with the current line held at a fixed height and surrounding lines fading toward the edges |
 | Statistics | Speed, accuracy, errors and time above the text; WPM for English and characters per minute (CPM) for Chinese and Cantonese |
@@ -46,6 +47,18 @@ Select **Local conversations** at the bottom of the page to find text for the se
 
 Local passages come from user messages and completed model replies within the past 30 days in the current DSH profile. Both roles are included. Short, medium and long modes select complete excerpts within the ranges above; timed mode prepares the required text before the run starts.
 
+## Falling words game
+
+Open the Typing practice panel, choose Practice or Game at the top center, then choose Start. Use your input method to confirm the exact text of one target to fire automatically. Extra or missing characters, or two targets combined in one commit, do not match. The input clears after each commit; composition keeps native candidate controls.
+
+Each missed target costs one of five lives. The remaining lives turn red at two. Every 30 seconds, the level increases and targets appear more often and fall faster. Starting difficulty matches the web game.
+
+Press Escape or Ctrl/Cmd+P to pause, then choose Continue to resume. Leaving the input, hiding the page or resizing the panel pauses automatically. Pause to switch back to practice. Leaving the panel stops audio and cleans up the round resources.
+
+Game settings contain the controls, Game sounds and Keyboard sounds. Hit and landing cues have a separate switch and volume. The four keyboard packs share their selection, switch and volume with practice inside DSH. Interface language and theme follow DSH.
+
+The best game score and latest 20 rounds are saved locally under a separate game key. Existing practice records and preferences are preserved. The game uses its bundled Chinese word list, without model calls or local conversation access.
+
 ## Keyboard sounds
 
 Open **Settings** in the top-right corner and find the **Sound** section. Choose Cherry MX Blue, Cherry MX Brown, NovelKeys Cream or Holy Panda. Click **Preview** to listen and use the volume slider to adjust the level. Sound is off by default, with an initial volume of 30%; your sound and volume choices are saved automatically. Settings are unavailable during a run. Finish or restart the run to make changes.
@@ -55,7 +68,7 @@ The four sound packs use MIT-licensed recordings from [kbsim](https://github.com
 ## Common controls
 
 - Click the text or focus it with `Tab` to start typing. Use your own input method to enter Chinese or Cantonese text.
-- **Restart** or `Esc`: practise the same text again.
+- In practice, **Restart** or `Esc` starts the same text again. In the game, Escape pauses.
 - **New passage**: use `⌘ R` on macOS or `Ctrl+R` on Windows / Linux. Hover over the button to see its shortcut.
 - **Cycle options**: use `⌘ T` for language, `⌘ D` for duration and `⌘ L` for passage length on macOS. Use `Ctrl` instead of `⌘` on Windows / Linux. Hover over an option group to see its shortcut.
 - **Records**: view personal bests and practice history after finishing or restarting a run.

@@ -4,6 +4,7 @@ import { Analytics } from '@vercel/analytics/react';
 import { createPractice } from '../../../packages/practice/src/create-practice.js';
 import { createLocale, initialLanguage, initialTheme } from './preferences.js';
 import { createWebPlatform } from './platform.js';
+import { createModeNavigation } from '../../../packages/practice/src/mode-navigation.js';
 import './web.css';
 
 const h = React.createElement;
@@ -49,18 +50,7 @@ function WebSettings({ language }) {
       saveError ? h('p', { className: 'tp-save-error', role: 'status' }, zh ? '设置已应用，但未能保存到浏览器。' : 'Settings applied, but could not be saved in this browser.') : null));
 }
 
-const ModeContext = React.createContext(null);
-function ModeSwitch({ disabled, title }) {
-  const { mode, setMode, language } = React.useContext(ModeContext);
-  const zh = language === 'zh';
-  return h('nav', { className: 'tp-seg tf-mode-switch', 'aria-label': zh ? '模式' : 'Mode' },
-    ...[['practice', zh ? '练习' : 'Practice'], ['game', zh ? '游戏' : 'Game']].map(([id, label]) =>
-      h('button', { key: id, className: 'tp-seg-btn' + (mode === id ? ' active' : ''), type: 'button',
-        'aria-pressed': mode === id, disabled, title: disabled ? title : undefined, onClick: () => {
-          history.replaceState(null, '', id === 'game' ? '#game' : location.pathname + location.search);
-          setMode(id);
-        } }, label)));
-}
+const { Context: ModeContext, Navigation: ModeSwitch } = createModeNavigation(React);
 
 const webPlatform = { ...createWebPlatform(locale, WebSettings), Navigation: ModeSwitch };
 const { TypingPage, CSS } = createPractice(React, webPlatform);
@@ -78,7 +68,11 @@ const GamePage = React.lazy(async () => {
 });
 
 function App() {
-  const [mode, setMode] = React.useState(() => location.hash === '#game' ? 'game' : 'practice');
+  const [mode, updateMode] = React.useState(() => location.hash === '#game' ? 'game' : 'practice');
+  function setMode(id) {
+    history.replaceState(null, '', id === 'game' ? '#game' : location.pathname + location.search);
+    updateMode(id);
+  }
   const [language, setLanguage] = React.useState(locale.getLocale().active);
   React.useEffect(() => locale.subscribe(() => setLanguage(locale.getLocale().active)), []);
   return h(ModeContext.Provider, { value: { mode, setMode, language } },

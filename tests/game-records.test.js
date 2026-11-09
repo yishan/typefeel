@@ -49,3 +49,13 @@ test('a lower score does not replace the best and stored records include rule an
   assert.equal(records.history[0].wordsVersion, 1);
   assert.equal(records.history[0].mode, 'survival');
 });
+
+test('DSH game records use the supplied key and preserve web and existing DSH practice records', () => {
+  const key = 'dsh.typing-practice.game.records.v1';
+  const storage = store([[GAME_RECORDS_KEY, 'web-records'], ['dsh.typing-practice.v4', 'practice-records']]);
+  saveGameResult(storage, result, key);
+  assert.equal(loadGameRecords(storage, key).best, 120);
+  assert.equal(storage.getItem(GAME_RECORDS_KEY), 'web-records');
+  assert.equal(storage.getItem('dsh.typing-practice.v4'), 'practice-records');
+  assert.equal(JSON.parse(storage.getItem(key)).history[0].score, 120);
+});

@@ -9,9 +9,9 @@ function valid(record) {
     && ['score', 'kills', 'bestCombo', 'time', 'level', 'at'].every(key => number(record[key]));
 }
 
-export function loadGameRecords(storage) {
+export function loadGameRecords(storage, key = GAME_RECORDS_KEY) {
   try {
-    const value = JSON.parse(storage.getItem(GAME_RECORDS_KEY) || 'null');
+    const value = JSON.parse(storage.getItem(key) || 'null');
     if (value?.version !== 1 || !Number.isInteger(value.rulesVersion) || value.rulesVersion < 1
       || value.rulesVersion > RULES_VERSION || value.wordsVersion !== WORDS_VERSION) return empty();
     const history = Array.isArray(value.history) ? value.history.filter(valid).slice(0, 20) : [];
@@ -25,12 +25,12 @@ export function loadGameRecords(storage) {
   } catch { return empty(); }
 }
 
-export function saveGameResult(storage, state) {
+export function saveGameResult(storage, state, key = GAME_RECORDS_KEY) {
   const record = { score: state.score, kills: state.kills, bestCombo: state.bestCombo, time: Math.round(state.time), level: state.level,
     language: 'zh', mode: 'survival', rulesVersion: RULES_VERSION, wordsVersion: WORDS_VERSION, at: Date.now() };
-  const previous = loadGameRecords(storage);
+  const previous = loadGameRecords(storage, key);
   const best = Math.max(previous.best, record.score);
   const next = { ...previous, best, bests: { ...previous.bests, [RULES_VERSION]: best }, history: [record, ...previous.history].slice(0, 20) };
-  try { storage.setItem(GAME_RECORDS_KEY, JSON.stringify(next)); return { ...next, saved: true }; }
+  try { storage.setItem(key, JSON.stringify(next)); return { ...next, saved: true }; }
   catch { return { ...next, saved: false }; }
 }
