@@ -11,7 +11,7 @@ export function createGameEngine({ words = gameWords, random = Math.random, lane
   const rules = { countdownMs: 3000, spawnMs: 2400, fallMs: 9000, maxTargets: 5, lives: 5, ...config };
   const pool = [...new Set(words)];
   const state = { status: 'ready', countdown: 3, time: 0, score: 0, lives: rules.lives, level: 1,
-    kills: 0, combo: 0, bestCombo: 0, targets: [], shots: [], buffer: '', error: false, misses: 0 };
+    kills: 0, combo: 0, bestCombo: 0, targets: [], shots: [], error: false, misses: 0 };
   let version = 0;
   let laneCount = Math.max(1, lanes);
   let nextId = 1;
@@ -30,8 +30,7 @@ export function createGameEngine({ words = gameWords, random = Math.random, lane
     if (state.targets.length >= max) return;
     const available = Array.from({ length: laneCount }, (_, i) => i)
       .filter(lane => !state.targets.some(target => target.lane === lane && progress(target) < .22));
-    const eligible = pool.filter(text => !state.targets.some(target => target.text.startsWith(text) || text.startsWith(target.text))
-      && (!state.buffer || !state.buffer.startsWith(text)));
+    const eligible = pool.filter(text => !state.targets.some(target => target.text.startsWith(text) || text.startsWith(target.text)));
     if (!available.length || !eligible.length) return;
     const text = eligible[index(eligible.length)];
     const fallMs = Math.max(rules.fallMs * 2 / 3, rules.fallMs - (state.level - 1) * 400) * (1 + .18 * ([...text].length - 1));
@@ -59,7 +58,6 @@ export function createGameEngine({ words = gameWords, random = Math.random, lane
         state.lives = Math.max(0, state.lives - missed.length);
         state.misses += missed.length;
         state.combo = 0;
-        state.error = Boolean(state.buffer) && !state.targets.some(target => target.status === 'falling' && target.text.startsWith(state.buffer));
         change();
         if (!state.lives) { state.status = 'ended'; break; }
       }
@@ -97,24 +95,20 @@ export function createGameEngine({ words = gameWords, random = Math.random, lane
     tick,
     submit(value, now) {
       tick(now);
-      if (state.status !== 'running') return state.buffer;
-      let buffer = value;
-      while (buffer) {
-        const target = state.targets.find(target => target.status === 'falling' && buffer.startsWith(target.text));
-        if (!target) break;
+      if (state.status !== 'running' || !value) return '';
+      const target = state.targets.find(target => target.status === 'falling' && value === target.text);
+      if (target) {
         target.hitProgress = progress(target);
         target.status = 'hit';
         state.shots.push({ id: target.id, lane: target.lane, progress: target.hitProgress, firedAt: state.time, endsAt: state.time + SHOT_MS });
-        buffer = buffer.slice(target.text.length);
         state.score += 10 * [...target.text].length;
         state.kills++; state.combo++;
         state.bestCombo = Math.max(state.bestCombo, state.combo);
       }
-      state.buffer = buffer;
-      state.error = Boolean(buffer) && !state.targets.some(target => target.status === 'falling' && target.text.startsWith(buffer));
+      state.error = !target;
       if (state.error) state.combo = 0;
       change();
-      return buffer;
+      return '';
     },
     pause(now) {
       tick(now);

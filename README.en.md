@@ -27,9 +27,9 @@ Settings include cursor, pronunciation, sound, interface language and light / da
 
 This branch adds a Practice / Game switch. Open `http://127.0.0.1:4173/#game` locally to try it.
 
-Chinese characters and words fall from above. Confirm a complete target using your own input method to fire a glowing cursor. You can also confirm a word one character at a time. Each missed target costs one life; five misses end the round. Difficulty increases every 30 seconds of survival.
+Chinese characters and words fall from above. Each confirmed input must exactly match one whole target to fire a glowing cursor. Extra characters, partial words and concatenated targets do not match. The input clears after every commit. Each missed target costs one life; the remaining life bars turn red at two lives or fewer, and five misses end the round. Difficulty increases every 30 seconds of survival.
 
-Pause to switch modes. Leaving the input or hiding the page pauses automatically; choose Continue to resume. Escape restarts outside composition and stays available to the IME during composition. The best score and last 20 round results stay in your browser, separate from practice records. The first game corpus contains 120 Chinese characters and two-character words.
+Click Pause or press Escape or Ctrl/Cmd+P to pause, then choose Continue to resume. Leaving the input or hiding the page pauses automatically. Pause to switch modes. During composition, candidate keys stay available to your input method. Game settings explain the controls and difficulty levels. The best score and last 20 round results stay in your browser, separate from practice records. The first game corpus contains 120 Chinese characters and two-character words.
 
 The preview is on `codex/falling-words-game`, awaiting playtesting. It has not been merged into `main` or published to the production website. See the [verification record](docs/verification/2026-11-09-falling-words.md) for coverage and limits.
 

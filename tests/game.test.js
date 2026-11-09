@@ -29,15 +29,16 @@ test('countdown does not spend lives or survival time and starts with a target',
   assert.equal(engine.state.time, 0);
 });
 
-test('a partial committed word waits, then one whole word reserves exactly one target', () => {
+test('each confirmed string must equal a whole target and is cleared after success or failure', () => {
   const engine = game();
-  engine.submit('春', 100);
-  assert.equal(engine.state.buffer, '春');
-  assert.equal(engine.state.error, false);
+  assert.equal(engine.submit('春', 100), '');
+  assert.equal(engine.state.error, true);
   assert.equal(engine.state.shots.length, 0);
+  assert.equal(engine.submit('天', 150), '');
+  assert.equal(engine.state.kills, 0);
   engine.submit('春天', 200);
   assert.equal(engine.state.score, 20);
-  assert.equal(engine.state.buffer, '');
+  assert.equal(engine.state.error, false);
   assert.equal(engine.state.kills, 1);
   assert.equal(engine.state.shots.length, 1);
   assert.equal(engine.state.targets[0].status, 'hit');
@@ -47,24 +48,33 @@ test('a partial committed word waits, then one whole word reserves exactly one t
   assert.equal(engine.state.targets.length, 0);
 });
 
-test('one native commit can consume several distinct complete targets in order', () => {
+test('an extra suffix rejects the entire attempt without a partial kill or a retained suffix', () => {
   const engine = game(); engine.tick(2400);
   assert.deepEqual(engine.state.targets.map(target => target.text), ['春天', '山']);
-  engine.submit('春天山错', 2401);
-  assert.equal(engine.state.score, 30);
-  assert.equal(engine.state.kills, 2);
-  assert.equal(engine.state.buffer, '错');
+  assert.equal(engine.submit('春天错', 2401), '');
+  assert.equal(engine.state.score, 0);
+  assert.equal(engine.state.kills, 0);
+  assert.equal(engine.state.shots.length, 0);
+  assert.ok(engine.state.targets.every(target => target.status === 'falling'));
   assert.equal(engine.state.error, true);
 });
 
-test('wrong input stays editable and never costs a life; backspace can restore a prefix', () => {
+test('concatenating two complete targets is one unmatched attempt', () => {
+  const engine = game(); engine.tick(2400);
+  assert.equal(engine.submit('春天山', 2401), '');
+  assert.equal(engine.state.score, 0);
+  assert.equal(engine.state.error, true);
+});
+
+test('wrong input is cleared without costing a life and the next complete word can still hit', () => {
   const engine = game(); engine.submit('春错', 100);
   assert.equal(engine.state.error, true);
   assert.equal(engine.state.lives, 5);
-  engine.submit('春', 200);
-  assert.equal(engine.state.error, false);
+  assert.equal(engine.submit('春', 200), '');
+  assert.equal(engine.state.error, true);
   engine.submit('春天', 300);
   assert.equal(engine.state.kills, 1);
+  assert.equal(engine.state.error, false);
 });
 
 test('spawns never duplicate a visible word or introduce whole-word prefix ambiguity', () => {
@@ -131,4 +141,13 @@ test('changing lanes while paused preserves progress and a new engine owns an in
   const second = game(); second.submit('春天', 100);
   assert.equal(first.state.kills, 0);
   assert.equal(second.state.kills, 1);
+});
+
+test('level two actually spawns faster and gives new single-character targets less falling time', () => {
+  const engine = game(['山', '水', '风', '雨', '火', '云'], { lives: 1000 });
+  engine.tick(31200);
+  assert.equal(engine.state.level, 2);
+  assert.equal(engine.state.targets.find(target => target.bornAt === 31200).fallMs, 8600);
+  engine.tick(33480);
+  assert.ok(engine.state.targets.some(target => target.bornAt === 33480));
 });

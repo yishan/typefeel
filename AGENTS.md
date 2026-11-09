@@ -8,8 +8,9 @@ and DSH plugin build from it. Do not copy shared behavior into either adapter.
 - `data/passages.json`: original corpus, 96 passages per language.
 - `dist`: generated output; never edit or commit it.
 
-Preserve the immersive layout and native IME behavior. Web shortcuts are Escape
-only; DSH keeps its existing Cmd/Ctrl shortcuts. Never read DSH conversations
+Preserve the immersive layout and native IME behavior. Web practice shortcuts
+are Escape only; the web game pauses with Escape or Cmd/Ctrl+P. DSH keeps its
+existing Cmd/Ctrl shortcuts. Never read DSH conversations
 from the standalone website. Keep the DSH storage keys and module identity
 stable so installed users retain preferences and records.
 

@@ -15,12 +15,12 @@ export const CSS = `
 .tf-game-lives { display: flex; align-items: center; gap: 6px; height: 31px; }
 .tf-game-life { display: block; width: 4px; height: 20px; border-radius: 2px; background: var(--tf-brand-primary); transition: background 160ms ease; }
 .tf-game-life[data-lost="true"] { background: var(--tf-border-l1); }
+.tf-game-lives[data-low="true"] .tf-game-life:not([data-lost="true"]) { background: var(--tf-state-error-primary); }
 .tf-game-stage { position: relative; isolation: isolate; flex: 1; min-height: 180px; overflow: hidden; border-bottom: 1px solid var(--tf-border-l2); cursor: text; }
 .tf-game-stage[data-miss="true"] { border-bottom-color: var(--tf-state-error-primary); }
 .tf-game-target { position: absolute; top: 0; left: 0; white-space: nowrap; font-size: clamp(24px, 3vw, 30px); line-height: 1.25; letter-spacing: .08em; font-weight: 450; will-change: transform; }
 .tf-game-target[data-danger="true"] { color: var(--tf-state-error-primary); }
 .tf-game-target[data-hit="true"] { color: var(--tf-brand-primary); animation: tf-game-hit 160ms ease-out both; }
-.tf-game-match { color: var(--tf-brand-primary); }
 .tf-game-shot, .tf-game-emitter { pointer-events: none; width: 3px; border-radius: 2px; background: var(--tp-cursor-color); ${CURSOR_GLOW} }
 .tf-game-shot { position: absolute; top: 0; left: 0; height: 18px; transform-origin: center; will-change: transform; }
 .tf-game-emitter { height: 22px; margin: 0 auto 8px; }
@@ -31,7 +31,8 @@ export const CSS = `
 .tf-game-input[aria-invalid="true"] { color: var(--tf-state-error-primary); border-bottom-color: var(--tf-state-error-primary); }
 .tf-game-hint { min-height: 18px; margin: 5px 0 0; font-size: 12px; color: var(--tf-label-secondary); }
 .tf-game-hint[data-error="true"] { color: var(--tf-state-error-primary); }
-.tf-game-footer { display: flex; flex: none; justify-content: space-between; gap: 12px; font-size: 12px; color: var(--tf-label-secondary); font-variant-numeric: tabular-nums; }
+.tf-game-footer { display: flex; flex: none; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; font-size: 12px; color: var(--tf-label-secondary); font-variant-numeric: tabular-nums; }
+.tf-game-summary { margin-inline-start: auto; white-space: nowrap; }
 .tf-game-overlay { position: absolute; inset: 0; z-index: 2; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 18px; padding: 16px; text-align: center; background: var(--tf-bg-base); }
 .tf-game-overlay h2 { margin: 0; font-size: 30px; font-weight: 550; letter-spacing: -.035em; }
 .tf-game-overlay p { margin: 0; max-width: 340px; font-size: 14px; color: var(--tf-label-secondary); line-height: 1.8; }
@@ -41,7 +42,8 @@ export const CSS = `
 .tf-game-result-score { font-size: 50px; line-height: 1; font-weight: 450; color: var(--tf-brand-primary); font-family: var(--tp-font-mono); }
 .tf-game-result-stats { display: flex; justify-content: center; gap: 28px; }
 .tf-game-result-stats .tf-game-stat-value { font-size: 21px; }
-.tf-game-settings { max-width: 480px; width: calc(100% - 40px); border: 1px solid var(--tf-border-l1); border-radius: 12px; color: var(--tf-label-primary); background: var(--tf-bg-base); padding: 24px; }
+.tf-game-settings { max-width: 480px; width: calc(100% - 40px); max-height: 85svh; overflow-y: auto; border: 1px solid var(--tf-border-l1); border-radius: 12px; color: var(--tf-label-primary); background: var(--tf-bg-base); padding: 24px; }
+.tf-game-rules p { margin: 0 0 10px; color: var(--tf-label-secondary); font-size: 13px; line-height: 1.7; }
 .tf-game-settings::backdrop { background: #0005; }
 .tf-game-settings-close { display: block; margin: 20px 0 0 auto; }
 @keyframes tf-game-hit { to { opacity: 0; filter: blur(3px); } }
