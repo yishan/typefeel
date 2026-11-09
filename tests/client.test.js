@@ -330,7 +330,10 @@ function mountDefaultClient(locale, initialStorage = {}, failSave = false, loadC
       return findAll(node => node.type === 'rt', board.type(board.props));
     },
     hintError: () => find(node => node.props.role === 'status', find(node => node.props.className === 'tp-sound-status tp-hint-status'))?.children[0],
-    privacyInSubtitle: () => Boolean(find(node => node.props.className === 'tp-privacy-note', find(node => node.props.className === 'tp-subtitle'))),
+    subtitle: () => {
+      const content = node => typeof node === 'string' ? node : (node?.children || []).flat(Infinity).map(content).join('');
+      return content(find(node => node.props.className === 'tp-subtitle'));
+    },
     cursorShape(shape) { find(node => node.type === 'select' && node.props['aria-label'] === '形状').props.onChange({ currentTarget: { value: shape } }); render(); },
     cursorPreference: () => JSON.parse(storage.get('dsh.typing-practice.cursor.v1') || 'null'),
     restart() {
@@ -1818,16 +1821,16 @@ test('invalid hint preferences use the default and failed saves still apply unti
   app.language('粤语', null); assert.equal(app.board().hints, 'off');
 });
 
-test('the privacy note stays beside the subtitle for every language and corpus source', async () => {
+test('the concise Chinese subtitle stays the same for every practice language and corpus source', async () => {
   const app = mountClient();
-  assert.equal(app.privacyInSubtitle(), true);
+  assert.equal(app.subtitle(), '实时统计打字速度与准确率');
   await app.usePassage('This local passage is used only within the current practice session.');
-  assert.equal(app.privacyInSubtitle(), true);
+  assert.equal(app.subtitle(), '实时统计打字速度与准确率');
   app.builtin();
-  assert.equal(app.privacyInSubtitle(), true);
+  assert.equal(app.subtitle(), '实时统计打字速度与准确率');
   for (const language of ['中文', '粤语', '英文']) {
     app.language(language);
-    assert.equal(app.privacyInSubtitle(), true);
+    assert.equal(app.subtitle(), '实时统计打字速度与准确率');
   }
 });
 
