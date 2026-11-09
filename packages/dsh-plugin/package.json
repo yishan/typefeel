@@ -1,6 +1,6 @@
 {
   "name": "dsh-typing-practice",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "type": "module",
   "description": "Typing practice and a falling words game in DSH with native IME input, keyboard sounds and local scores.",
   "license": "MIT",

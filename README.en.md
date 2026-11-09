@@ -47,7 +47,7 @@ The website uses built-in passages. The DSH plugin can additionally select recen
 
 This repository also builds [dsh-typing-practice](https://github.com/yishan/dsh-typing-practice) from the same practice source. The plugin keeps its existing GitHub and npm installation paths, local conversation access and platform shortcuts.
 
-The plugin source also provides the same Practice / Game switch. The game fits the DSH panel, follows its language and theme, shares keyboard sound settings with practice inside DSH, and stores game records separately. See the [plugin guide](packages/dsh-plugin/README.en.md). New source features reach existing installation channels through a separate plugin release.
+The plugin provides the same Practice / Game switch from version 0.2.0. The game fits the DSH panel, follows its language and theme, shares keyboard sound settings with practice inside DSH, and stores game records separately. See the [plugin guide](packages/dsh-plugin/README.en.md).
 
 ## Run locally
 
