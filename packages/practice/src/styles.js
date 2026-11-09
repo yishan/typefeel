@@ -38,7 +38,9 @@ export const CSS = `
 }
 .tp-header-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .tp-brand { display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1 1 340px; }
-.tp-logo { width: 42px; height: 42px; border-radius: 12px; flex: none; display: grid; place-items: center; background: var(--tf-bg-layer-2); border: 1px solid var(--tf-border-l1); color: var(--tf-brand-primary); pointer-events: none; user-select: none; }
+.tp-logo { width: 42px; height: 42px; border-radius: 12px; flex: none; display: flex; align-items: center; justify-content: center; overflow: hidden; background: var(--tf-bg-layer-2); color: var(--tf-brand-primary); pointer-events: none; user-select: none; }
+/* Crop the icon's built-in margin by the same ratio in every mode and size (64px art in a 42px box). */
+.tp-logo img { width: calc(100% * 64 / 42); height: calc(100% * 64 / 42); max-width: none; flex: none; object-fit: contain; }
 .tp-brandtext { min-width: 0; }
 .tp-title {
   margin: 0;

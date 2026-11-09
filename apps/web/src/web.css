@@ -32,9 +32,6 @@ button, select, input { font: inherit; }
 /* Only the outer shell differs from DSH. Typing geometry comes from the shared UI. */
 #app .tp-page { max-width: 1000px; padding-top: clamp(28px, 5vh, 64px); }
 #app .tp-title { font-size: 23px; }
-#app .tp-logo { display: flex; align-items: center; justify-content: center; overflow: hidden; border: 0; }
-/* Keep the outlined mark legible within the header icon. */
-#app .tp-logo img { width: 64px; height: 64px; max-width: none; flex: none; object-fit: contain; }
 #app .tp-brand { flex-basis: 380px; }
 #app .tp-toolbar { justify-content: center; }
 .tf-interface-controls { max-width: 390px; }

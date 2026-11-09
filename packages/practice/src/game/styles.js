@@ -7,7 +7,6 @@ export const CSS = `
 .tf-game-root .tp-header { align-items: center; flex-wrap: nowrap; gap: 12px; }
 .tf-game-root .tp-brand { flex: 1 1 auto; min-width: 42px; }
 .tf-game-root .tp-logo { flex: 0 0 42px; aspect-ratio: 1; }
-.tf-game-root .tp-logo img { width: 100%; height: 100%; object-fit: contain; }
 .tf-game-root .tp-header-actions { flex-wrap: nowrap; gap: 8px; }
 .tf-game-stats { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 12px; padding: 4px 0 8px; font-variant-numeric: tabular-nums; }
 .tf-game-progress { display: flex; gap: 32px; min-width: 0; }
