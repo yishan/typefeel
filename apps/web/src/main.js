@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { createRoot } from 'react-dom/client';
+import { Analytics } from '@vercel/analytics/react';
 import { createPractice } from '../../../packages/practice/src/create-practice.js';
 import { createLocale, initialLanguage, initialTheme } from './preferences.js';
 import { createWebPlatform } from './platform.js';
@@ -53,4 +54,4 @@ const style = document.createElement('style');
 style.dataset.typefeelStyle = '';
 style.textContent = CSS;
 document.head.appendChild(style);
-createRoot(document.getElementById('app')).render(h(TypingPage));
+createRoot(document.getElementById('app')).render(h(React.Fragment, null, h(TypingPage), h(Analytics)));

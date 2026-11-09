@@ -24,8 +24,11 @@
     "esbuild": "0.28.2",
     "mdast-util-from-markdown": "2.0.2",
     "pinyin-pro": "3.29.5",
-    "to-jyutping": "3.1.1",
     "react": "19.3.1",
-    "react-dom": "19.3.1"
+    "react-dom": "19.3.1",
+    "to-jyutping": "3.1.1"
+  },
+  "dependencies": {
+    "@vercel/analytics": "^2.0.1"
   }
 }
