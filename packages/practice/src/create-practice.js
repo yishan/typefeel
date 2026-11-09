@@ -2,6 +2,7 @@ import * as PracticeCorpus from './practice-text.js';
 import { dictionaries as defaultDictionaries } from './copy.js';
 import { CSS } from './styles.js';
 import { characters, textEdit } from './native-input.js';
+import { SOUND_PACKS, soundPreference, keySoundKind } from './keyboard-sound.js';
 
 // Each mount owns its locale, caches and preferences. Platform services are
 // provided by the web or DSH entry; this module never imports a host runtime.
@@ -19,7 +20,6 @@ export function createPractice(React, platform) {
     const EXERCISE_KEY = `${storagePrefix}.exercise.v2`;
     const LEGACY_EXERCISE_KEY = `${storagePrefix}.exercise.v1`;
     const SOUND_KEY = `${storagePrefix}.sound.v1`;
-    const SOUND_PACKS = ['off', 'mxblue', 'mxbrown', 'cream', 'holypanda'];
     const CURSOR_KEY = `${storagePrefix}.cursor.v1`;
     const CURSOR_SHAPES = ['line', 'underline', 'outline'];
     const LANGUAGES = ['en', 'zh', 'yue'];
@@ -302,9 +302,7 @@ export function createPractice(React, platform) {
     }
 
     function loadSoundPreference() {
-      const saved = readStored(SOUND_KEY);
-      return { version: 1, pack: saved?.version === 1 && SOUND_PACKS.includes(saved.pack) ? saved.pack : 'off',
-        volume: saved?.version === 1 && Number.isFinite(saved.volume) ? Math.max(0, Math.min(100, Math.round(saved.volume))) : 30 };
+      return soundPreference(readStored(SOUND_KEY));
     }
 
     function loadHintPreference() {
@@ -769,10 +767,8 @@ export function createPractice(React, platform) {
           || current.mode === 'timed' && current.startAt != null && performance.now() - current.startAt >= current.duration * 1000
           || event.repeat || input.repeat || event.ctrlKey || event.metaKey || event.altKey
           || soundPreferenceRef.current.pack === 'off' || !soundPreferenceRef.current.volume) return;
-        const key = event.key;
-        const composing = compositionRef.current.active || input.isComposing || event.isComposing || input.keyCode === 229;
-        if (!(key?.length === 1 || ['Backspace', 'Delete', 'Process', 'Unidentified'].includes(key) || key === 'Enter' && composing)) return;
-        const kind = key === ' ' || input.code === 'Space' ? 'space' : key === 'Backspace' || key === 'Delete' ? 'backspace' : key === 'Enter' ? 'enter' : 'generic';
+        const kind = keySoundKind(event, input, compositionRef.current.active);
+        if (!kind) return;
         if (state.player && state.context.state === 'running' && state.status === 'ready' && state.pack === soundPreferenceRef.current.pack) state.player.play(kind);
         else if (state.status !== 'error') void prepareSound(); // Drop unready keystrokes, never replay a burst.
       }

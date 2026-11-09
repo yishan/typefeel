@@ -61,7 +61,8 @@ function ModeSwitch({ disabled, title }) {
         } }, label)));
 }
 
-const { TypingPage, CSS } = createPractice(React, { ...createWebPlatform(locale, WebSettings), Navigation: ModeSwitch });
+const webPlatform = { ...createWebPlatform(locale, WebSettings), Navigation: ModeSwitch };
+const { TypingPage, CSS } = createPractice(React, webPlatform);
 const style = document.createElement('style');
 style.dataset.typefeelStyle = '';
 style.textContent = CSS;
@@ -81,6 +82,6 @@ function App() {
   React.useEffect(() => locale.subscribe(() => setLanguage(locale.getLocale().active)), []);
   return h(ModeContext.Provider, { value: { mode, setMode, language } },
     h(React.Suspense, { fallback: h('p', { className: 'tf-loading', role: 'status' }, language === 'zh' ? '正在加载…' : 'Loading…') },
-      mode === 'game' ? h(GamePage, { language, storage, Navigation: ModeSwitch, Settings: WebSettings }) : h(TypingPage)));
+      mode === 'game' ? h(GamePage, { language, storage, Navigation: ModeSwitch, Settings: WebSettings, loadAudio: webPlatform.loadAudio }) : h(TypingPage)));
 }
 createRoot(document.getElementById('app')).render(h(App));

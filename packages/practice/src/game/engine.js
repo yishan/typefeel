@@ -2,13 +2,15 @@ import corpus from '../../../../data/game-words.json' with { type: 'json' };
 
 export const gameWords = corpus.words;
 export const WORDS_VERSION = corpus.version;
-export const RULES_VERSION = 1;
+export const RULES_VERSION = 2;
 export const SHOT_MS = 160;
 
 // The engine uses one pause-aware clock. Frames and native commits advance the
 // same event timeline; spawning and misses do not depend on frame frequency.
 export function createGameEngine({ words = gameWords, random = Math.random, lanes = 5, config = {} } = {}) {
-  const rules = { countdownMs: 3000, spawnMs: 2400, fallMs: 9000, maxTargets: 5, lives: 5, ...config };
+  const rules = { countdownMs: 3000, spawnMs: 2160, fallMs: 8200, maxTargets: 6, lives: 5, ...config };
+  const minimumSpawn = Math.min(1200, rules.spawnMs);
+  const minimumFall = Math.min(6000, rules.fallMs);
   const pool = [...new Set(words)];
   const state = { status: 'ready', countdown: 3, time: 0, score: 0, lives: rules.lives, level: 1,
     kills: 0, combo: 0, bestCombo: 0, targets: [], shots: [], error: false, misses: 0 };
@@ -33,7 +35,7 @@ export function createGameEngine({ words = gameWords, random = Math.random, lane
     const eligible = pool.filter(text => !state.targets.some(target => target.text.startsWith(text) || text.startsWith(target.text)));
     if (!available.length || !eligible.length) return;
     const text = eligible[index(eligible.length)];
-    const fallMs = Math.max(rules.fallMs * 2 / 3, rules.fallMs - (state.level - 1) * 400) * (1 + .18 * ([...text].length - 1));
+    const fallMs = Math.max(minimumFall, rules.fallMs - (state.level - 1) * 400) * (1 + .18 * ([...text].length - 1));
     state.targets.push({ id: nextId++, text, lane: available[index(available.length)], bornAt: state.time, fallMs, status: 'falling' });
     change();
   }
@@ -63,7 +65,7 @@ export function createGameEngine({ words = gameWords, random = Math.random, lane
       }
       if (nextSpawn <= eventTime) {
         spawn();
-        nextSpawn = eventTime + Math.max(rules.spawnMs / 2, rules.spawnMs - (state.level - 1) * 120);
+        nextSpawn = eventTime + Math.max(minimumSpawn, rules.spawnMs - (state.level - 1) * 120);
       }
     }
     if (state.status === 'running') {

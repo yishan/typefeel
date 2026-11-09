@@ -2,33 +2,40 @@ import { createGameEngine, SHOT_MS } from './engine.js';
 import { createCommittedBuffer } from '../native-input.js';
 import { loadGameRecords, saveGameResult } from './records.js';
 import { handleGamePauseShortcut } from './shortcuts.js';
+import { createGameAudio, loadGameAudioPreferences, saveGameAudioPreferences, KEYBOARD_PACKS } from './audio.js';
+import { dictionaries } from '../copy.js';
 export { CSS } from './styles.js';
 
 const copy = {
   zh: { title: '字感', subtitle: '落字游戏', score: '得分', lives: '生命', level: '等级', combo: '连击', pause: '暂停', resume: '继续',
-    settings: '设置', close: '关闭', start: '开始游戏', ready: '落字', rule: '输入完整文字，发射光标。漏掉 5 个，本局结束。',
+    settings: '设置', close: '关闭', start: '开始', ready: '落字', rule: '输入完整文字，发射光标。漏掉 5 个，本局结束。',
     paused: '已暂停', ended: '本局结束', restart: '再来一局', input: '输入落下的文字', placeholder: '输入文字',
     hint: '整字或整词上屏后自动发射', error: '没有匹配的目标，请输入完整词组', best: '最高', time: '存活', kills: '消除', bestCombo: '最高连击',
     gameplay: '玩法', gameplayHint: '输入完整词组以发射光标消灭目标。',
     matchingHint: '每次上屏只匹配一个完整目标，多字、少字均不匹配。上屏后输入框自动清空。',
     pauseHint: '按 Esc 或 Ctrl/Cmd+P 暂停，点击「继续」恢复。',
     levelHint: '每存活 30 秒提升一级，文字出现更频繁、下落更快，同屏目标上限逐步增加。',
+    effects: '游戏音效', keyboard: '键盘音效', volume: '音量', keyboardPack: '声音', preview: '试听',
+    audioLoading: '正在加载键盘音效…', audioError: '音效暂时无法播放，可以继续游戏。', audioSaveError: '音效设置已应用，但未能保存到浏览器。',
     saveError: '本局成绩未能保存到浏览器。', switchHint: '暂停后可切换模式', seconds: '秒' },
   en: { title: 'Type Feel', subtitle: 'Falling words', score: 'Score', lives: 'Lives', level: 'Level', combo: 'Combo', pause: 'Pause', resume: 'Continue',
-    settings: 'Settings', close: 'Close', start: 'Start game', ready: 'Falling words', rule: 'Type a complete target to fire a cursor. Five missed targets end the round.',
+    settings: 'Settings', close: 'Close', start: 'Start', ready: 'Falling words', rule: 'Type a complete target to fire a cursor. Five missed targets end the round.',
     paused: 'Paused', ended: 'Round over', restart: 'Play again', input: 'Type a falling word', placeholder: 'Type a word',
     hint: 'Confirm a whole character or word to fire', error: 'No matching target. Confirm a complete word.', best: 'Best', time: 'Survived', kills: 'Cleared', bestCombo: 'Best combo',
     gameplay: 'How to play', gameplayHint: 'Confirm a complete word to fire a cursor and clear the target.',
     matchingHint: 'Each commit must match one whole target. Extra or missing characters do not match. The input clears after every commit.',
     pauseHint: 'Press Esc or Ctrl/Cmd+P to pause. Choose Continue to resume.',
     levelHint: 'Every 30 seconds, the level increases. Targets appear more often and fall faster; the target limit gradually increases.',
+    effects: 'Game sounds', keyboard: 'Keyboard sounds', volume: 'Volume', keyboardPack: 'Sound', preview: 'Preview',
+    audioLoading: 'Loading keyboard sounds…', audioError: 'Audio is unavailable. You can keep playing.', audioSaveError: 'Sound settings applied, but could not be saved in your browser.',
     saveError: 'This score could not be saved in your browser.', switchHint: 'Pause to switch modes', seconds: 's' },
 };
 
 export function createGamePage(React) {
   const h = React.createElement;
-  return function GamePage({ language = 'zh', storage, Navigation, Settings }) {
+  return function GamePage({ language = 'zh', storage, Navigation, Settings, loadAudio }) {
     const t = copy[language] || copy.zh;
+    const soundCopy = dictionaries[language] || dictionaries.zh;
     const engineRef = React.useRef(null);
     if (!engineRef.current) engineRef.current = createGameEngine();
     const engine = engineRef.current;
@@ -39,6 +46,15 @@ export function createGamePage(React) {
     const [settingsOpen, setSettingsOpen] = React.useState(false);
     const [compact, setCompact] = React.useState(false);
     const [missFlash, setMissFlash] = React.useState(false);
+    const [audioPreferences, setAudioPreferences] = React.useState(() => loadGameAudioPreferences(storage));
+    const audioPreferencesRef = React.useRef(audioPreferences);
+    const [audioStatus, setAudioStatus] = React.useState({ effects: 'idle', keyboard: 'idle' });
+    const [audioSaveError, setAudioSaveError] = React.useState(false);
+    const audioRef = React.useRef(null);
+    if (!audioRef.current) audioRef.current = createGameAudio({
+      AudioContext: window.AudioContext || window.webkitAudioContext, loadAudio, preferences: audioPreferences,
+      onStatus: (group, status) => setAudioStatus(previous => ({ ...previous, [group]: status })),
+    });
     const rootRef = React.useRef(null);
     const stageRef = React.useRef(null);
     const inputRef = React.useRef(null);
@@ -54,6 +70,7 @@ export function createGamePage(React) {
 
     function refresh() {
       const current = engineRef.current;
+      audioRef.current.observe(current, !document.hidden && document.hasFocus());
       setView({ ...current.state, targets: current.state.targets.map(target => ({ ...target })), shots: [...current.state.shots] });
       if (current.state.status === 'ended' && savedEngine.current !== current) {
         savedEngine.current = current;
@@ -73,22 +90,37 @@ export function createGamePage(React) {
     if (!bufferRef.current) bufferRef.current = makeBuffer();
 
     function focusInput() { inputRef.current?.focus({ preventScroll: true }); }
-    function start() { engineRef.current.start(performance.now()); refresh(); focusInput(); }
+    function start() { void audioRef.current.prepare(); engineRef.current.start(performance.now()); refresh(); focusInput(); }
     function restart() {
+      audioRef.current.stop(); void audioRef.current.prepare();
       engineRef.current = createGameEngine({ lanes: engineRef.current.lanes });
       bufferRef.current = makeBuffer();
       setComposing(false); setRound(value => value + 1);
       engineRef.current.start(performance.now()); refresh();
     }
-    function pause() { engineRef.current.pause(performance.now()); refresh(); }
+    function pause() {
+      const current = engineRef.current;
+      if (current.state.status !== 'ended') audioRef.current.stop();
+      current.pause(performance.now()); refresh();
+    }
     function resume() {
       const current = engineRef.current;
+      void audioRef.current.prepare();
       current.resume(performance.now());
       if (inputRef.current) inputRef.current.readOnly = false;
       refresh(); focusInput();
     }
     const currentEvent = event => event.currentTarget === inputRef.current && engine === engineRef.current;
     const guardPointer = event => event.preventDefault();
+    function changeAudio(group, patch) {
+      const previous = audioPreferencesRef.current;
+      const next = { ...previous, [group]: { ...previous[group], ...patch } };
+      audioPreferencesRef.current = next; setAudioPreferences(next);
+      audioRef.current.configure(next);
+      setAudioSaveError(!saveGameAudioPreferences(storage, next, group));
+      void audioRef.current.prepare();
+    }
+    function closeSettings() { audioRef.current.stop(); setSettingsOpen(false); }
 
     function draw() {
       const current = engineRef.current;
@@ -119,6 +151,7 @@ export function createGamePage(React) {
     }
 
     React.useLayoutEffect(draw, [view]);
+    React.useEffect(() => () => audioRef.current.dispose(), []);
     React.useEffect(() => {
       if (round) focusInput();
     }, [round]);
@@ -159,14 +192,15 @@ export function createGamePage(React) {
         const widthChanged = Math.abs(previous.width - width) > 2;
         const keyboardResize = document.activeElement === inputRef.current && window.matchMedia('(pointer: coarse)').matches;
         if (previous.width && (widthChanged || Math.abs(previous.height - height) > 80 && !keyboardResize)) {
+          audioRef.current.stop();
           current.pause(performance.now());
         }
         if (lanes !== current.lanes) current.setLanes(lanes);
         layoutRef.current = { width, height };
         syncRef.current();
       }
-      function hidden() { if (document.hidden) { engineRef.current.pause(performance.now()); syncRef.current(); } }
-      function blur() { engineRef.current.pause(performance.now()); syncRef.current(); }
+      function hidden() { if (document.hidden) { audioRef.current.stop(); engineRef.current.pause(performance.now()); syncRef.current(); } }
+      function blur() { audioRef.current.stop(); engineRef.current.pause(performance.now()); syncRef.current(); }
       layout();
       window.addEventListener('resize', layout);
       window.visualViewport?.addEventListener('resize', layout);
@@ -201,6 +235,28 @@ export function createGamePage(React) {
       return h('div', { className: 'tf-game-stat' }, h('span', { className: 'tf-game-stat-label' }, label), h('span', { className: 'tf-game-stat-value' }, value));
     }
     function primary(label, onClick, ref) { return h('button', { className: 'tp-btn tf-game-primary', type: 'button', onClick, ref }, label); }
+    function audioControls(group) {
+      const preference = audioPreferences[group];
+      const title = t[group === 'effects' ? 'effects' : 'keyboard'];
+      const keyboard = group === 'keyboard';
+      return h('section', { className: 'tp-settings-section tf-game-audio-section', 'aria-labelledby': `tf-game-${group}-title` },
+        h('div', { className: 'tf-game-audio-heading' }, h('h3', { id: `tf-game-${group}-title` }, title),
+          h('button', { type: 'button', className: 'tp-btn tp-quiet', 'aria-label': `${t.preview}${language === 'zh' ? '' : ' '}${title}`,
+            disabled: !preference.enabled || !preference.volume || keyboard && audioStatus.keyboard === 'loading',
+            onClick: () => { if (keyboard) void audioRef.current.previewKeyboard(); else void audioRef.current.previewEffects(); } }, t.preview),
+          h('label', { className: 'tp-cursor-toggle' }, h('input', { type: 'checkbox', role: 'switch', 'aria-label': title,
+            checked: preference.enabled, onChange: event => changeAudio(group, { enabled: event.currentTarget.checked }) }))),
+        keyboard ? h('label', { className: 'tp-sound-field' }, h('span', null, t.keyboardPack),
+          h('span', { className: 'tp-select' }, h('select', { 'aria-label': language === 'zh' ? '键盘声音' : 'Keyboard sound',
+            value: preference.pack, disabled: !preference.enabled, onChange: event => changeAudio(group, { pack: event.currentTarget.value }) },
+            ...KEYBOARD_PACKS.map(pack => h('option', { key: pack, value: pack }, soundCopy['sound_' + pack]))),
+          h('svg', { className: 'tp-select-chevron', viewBox: '0 0 12 12', fill: 'none', stroke: 'currentColor', strokeWidth: 1.5, 'aria-hidden': true }, h('path', { d: 'M3 4.5 6 7.5 9 4.5' })))) : null,
+        h('label', { className: 'tp-sound-field' }, h('span', null, t.volume), h('span', { className: 'tp-sound-volume' },
+          h('input', { type: 'range', min: 0, max: 100, step: 5, value: preference.volume, disabled: !preference.enabled,
+            'aria-label': `${title}${language === 'zh' ? '' : ' '}${t.volume}`, 'aria-valuetext': `${preference.volume}%`,
+            onChange: event => changeAudio(group, { volume: Number(event.currentTarget.value) }) }), h('output', { 'aria-hidden': true }, `${preference.volume}%`))),
+        keyboard ? h('a', { className: 'tp-sound-credit', href: 'https://github.com/tplai/kbsim', target: '_blank', rel: 'noreferrer' }, soundCopy.soundCredit) : null);
+    }
     const live = ['running', 'countdown'].includes(view.status);
     const overlay = view.status === 'ready'
       ? [h('h2', { key: 'title' }, t.ready), h('p', { key: 'rule' }, t.rule), primary(t.start, start)]
@@ -225,13 +281,13 @@ export function createGamePage(React) {
             h('button', { className: 'tp-btn tp-quiet', type: 'button', disabled: !live || composing,
               'aria-keyshortcuts': 'Escape Control+P Meta+P', onPointerDown: guardPointer, onClick: pause }, t.pause),
             Settings ? h('button', { className: 'tp-btn tp-quiet', type: 'button', disabled: composing, onPointerDown: guardPointer,
-              onClick: () => { pause(); setSettingsOpen(true); } }, t.settings) : null)),
+              onClick: () => { pause(); setSettingsOpen(true); void audioRef.current.prepare(); } }, t.settings) : null)),
         h('div', { className: 'tf-game-stats', role: 'group', 'aria-label': language === 'zh' ? '游戏统计' : 'Game statistics' },
-          stat(t.score, view.score),
-          h('div', { className: 'tf-game-stat', 'aria-live': 'polite' }, h('span', { className: 'tf-game-stat-label' }, t.lives),
+          h('div', { className: 'tf-game-progress' }, stat(t.level, view.level), stat(t.combo, view.combo)),
+          h('div', { className: 'tf-game-stat tf-game-health', 'aria-live': 'polite' }, h('span', { className: 'tf-game-stat-label' }, t.lives),
             h('div', { className: 'tf-game-lives', role: 'img', 'data-low': String(view.lives <= 2), 'aria-label': `${t.lives} ${view.lives} / 5` },
               ...Array.from({ length: 5 }, (_, i) => h('i', { key: i, className: 'tf-game-life', 'data-lost': String(i >= view.lives), 'aria-hidden': true })))),
-          stat(t.level, view.level), stat(t.combo, view.combo)),
+          h('div', { className: 'tf-game-score' }, stat(t.score, view.score))),
         h('div', { className: 'tf-game-stage', ref: stageRef, 'data-miss': String(missFlash),
           onPointerDown: event => { if (live) { event.preventDefault(); focusInput(); } } },
           ...view.targets.map(target => {
@@ -255,16 +311,29 @@ export function createGamePage(React) {
               bufferRef.current.input(event.currentTarget, event.nativeEvent);
               if (bufferRef.current.composing) setComposing(true);
             },
-            onKeyDown: event => { if (!bufferRef.current.composing && !event.nativeEvent.isComposing && event.nativeEvent.keyCode !== 229 && event.key === 'Enter') event.preventDefault(); },
+            onKeyDown: event => {
+              if (!document.hidden && document.activeElement === event.currentTarget && ['running', 'countdown'].includes(engineRef.current.state.status)) {
+                audioRef.current.key(event, event.nativeEvent, bufferRef.current.composing);
+              }
+              if (!bufferRef.current.composing && !event.nativeEvent.isComposing && event.nativeEvent.keyCode !== 229 && event.key === 'Enter') event.preventDefault();
+            },
+            onFocus: () => { void audioRef.current.prepare(); },
             onPaste: event => event.preventDefault(), onDrop: event => event.preventDefault(), onBlur: pause,
           }),
           h('p', { className: 'tf-game-hint', id: 'tf-game-input-error', 'data-error': String(view.error && !composing), role: 'status' }, view.error && !composing ? t.error : '')),
         h('footer', { className: 'tf-game-footer' }, h('span', { id: 'tf-game-input-hint' }, t.hint), h('span', { className: 'tf-game-summary' }, `${t.best} ${records.best} · ${Math.floor(view.time / 1000)}${language === 'zh' ? ' 秒' : 's'}`)),
       )),
-      Settings ? h('dialog', { className: 'tf-game-settings', ref: dialogRef, 'aria-label': t.settings, onCancel: () => setSettingsOpen(false), onClose: () => setSettingsOpen(false) },
+      Settings ? h('dialog', { className: 'tf-game-settings', ref: dialogRef, 'aria-label': t.settings, onCancel: closeSettings, onClose: closeSettings },
+        h('div', { className: 'tf-game-settings-header' }, h('h2', null, t.settings),
+          h('button', { className: 'tp-btn tp-quiet', type: 'button', 'aria-label': t.close, onClick: closeSettings },
+            h('svg', { viewBox: '0 0 24 24', width: 18, height: 18, fill: 'none', stroke: 'currentColor', strokeWidth: 1.8, 'aria-hidden': true }, h('path', { d: 'M5 5 19 19M19 5 5 19' })))),
+        audioControls('effects'), audioControls('keyboard'),
+        h('p', { className: 'tf-game-audio-status', role: 'status' }, audioSaveError ? t.audioSaveError
+          : audioPreferences.keyboard.enabled && audioStatus.keyboard === 'error' || audioPreferences.effects.enabled && audioStatus.effects === 'error' ? t.audioError
+            : audioPreferences.keyboard.enabled && audioStatus.keyboard === 'loading' ? t.audioLoading : ''),
+        h(Settings, { language }),
         h('section', { className: 'tp-settings-section tf-game-rules', 'aria-labelledby': 'tf-game-rules-title' },
           h('h3', { id: 'tf-game-rules-title' }, t.gameplay),
-          h('p', null, t.gameplayHint), h('p', null, t.matchingHint), h('p', null, t.pauseHint), h('p', null, t.levelHint)),
-        h(Settings, { language }), h('button', { className: 'tp-btn tf-game-settings-close', type: 'button', onClick: () => setSettingsOpen(false) }, t.close)) : null);
+          h('p', null, t.gameplayHint), h('p', null, t.matchingHint), h('p', null, t.pauseHint), h('p', null, t.levelHint))) : null);
   };
 }

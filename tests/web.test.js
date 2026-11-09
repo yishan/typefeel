@@ -56,9 +56,12 @@ test('static web artifact has no DSH carrier, remote CDN or local source depende
 
 test('game code and word corpus are included only through the web entry', async () => {
   const graphs = JSON.parse(await readFile(new URL('../dist/build-inputs.json', import.meta.url), 'utf8'));
-  for (const path of ['packages/practice/src/game/create-game.js', 'packages/practice/src/game/engine.js', 'data/game-words.json']) {
+  for (const path of ['packages/practice/src/game/create-game.js', 'packages/practice/src/game/engine.js',
+    'packages/practice/src/game/audio.js', 'packages/practice/src/game/effects.js', 'data/game-words.json']) {
     assert.ok(graphs.web.includes(path), `web missing ${path}`);
     assert.equal(graphs['dsh-client'].includes(path), false, `plugin imported ${path}`);
   }
-  for (const key of ['web', 'dsh-client']) assert.ok(graphs[key].includes('packages/practice/src/native-input.js'));
+  for (const key of ['web', 'dsh-client']) {
+    for (const path of ['packages/practice/src/native-input.js', 'packages/practice/src/keyboard-sound.js']) assert.ok(graphs[key].includes(path));
+  }
 });

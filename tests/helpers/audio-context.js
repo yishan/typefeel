@@ -4,11 +4,12 @@ export function audioHarness(options = {}) {
   class AudioContext {
     constructor() {
       this.state = options.state || 'running'; this.currentTime = 0; this.destination = {};
-      this.sources = []; this.gains = []; this.decodes = 0; this.resumes = 0; this.closes = 0;
+      this.sources = []; this.oscillators = []; this.gains = []; this.decodes = 0; this.resumes = 0; this.closes = 0;
       contexts.push(this);
     }
     createGain() {
-      const node = { gain: { value: 0, setValueAtTime(value) { this.value = value; } }, connect() {}, disconnect() { this.disconnected = true; } };
+      const node = { gain: { value: 0, events: [], setValueAtTime(value, at) { this.value = value; this.events.push({ value, at }); },
+        exponentialRampToValueAtTime(value, at) { this.value = value; this.events.push({ value, at }); } }, connect() {}, disconnect() { this.disconnected = true; } };
       this.gains.push(node); return node;
     }
     createBufferSource() {
@@ -16,6 +17,13 @@ export function audioHarness(options = {}) {
         start(at) { if (options.startError) throw new Error('Cannot start'); this.started = at; },
         stop() { this.stopped = true; }, end() { this.onended?.(); } };
       this.sources.push(node); return node;
+    }
+    createOscillator() {
+      const node = { frequency: { events: [], setValueAtTime(value, at) { this.events.push({ value, at }); },
+        exponentialRampToValueAtTime(value, at) { this.events.push({ value, at }); } },
+        connect() {}, disconnect() { this.disconnected = true; }, start(at) { this.started = at; },
+        stop(at) { if (at === undefined) this.cancelled = true; else this.endsAt = at; } };
+      this.oscillators.push(node); return node;
     }
     decodeAudioData(bytes) {
       this.decodes++;

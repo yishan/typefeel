@@ -3,7 +3,7 @@ import test from 'node:test';
 import { createGameEngine, gameWords } from '../packages/practice/src/game/engine.js';
 
 function game(words = ['春天', '山', '阅读', '雨', '河流', '风'], config = {}) {
-  const engine = createGameEngine({ words, random: () => 0, config: { countdownMs: 0, ...config } });
+  const engine = createGameEngine({ words, random: () => 0, config: { countdownMs: 0, spawnMs: 2400, fallMs: 9000, maxTargets: 5, ...config } });
   engine.start(0); engine.tick(0);
   return engine;
 }
@@ -14,6 +14,22 @@ test('game corpus has unique canonical single characters and complete two-charac
   assert.ok(gameWords.every(text => /^[\p{Script=Han}]{1,2}$/u.test(text)));
   assert.ok(gameWords.some(text => [...text].length === 1));
   assert.ok(gameWords.some(text => [...text].length === 2));
+});
+
+test('default level one starts at the former level three difficulty', () => {
+  const engine = createGameEngine({ words: ['山', '水', '雨', '火'], random: () => 0, config: { countdownMs: 0 } });
+  engine.start(0); engine.tick(0);
+  assert.equal(engine.state.level, 1);
+  assert.equal(engine.state.targets[0].fallMs, 8200);
+  engine.tick(2160);
+  assert.ok(engine.state.targets.some(target => target.bornAt === 2160));
+});
+
+test('default level one permits six visible targets', () => {
+  const engine = createGameEngine({ words: ['山', '水', '雨', '火', '风', '云', '天'], lanes: 7,
+    random: () => 0, config: { countdownMs: 0, fallMs: 100000 } });
+  engine.start(0); engine.tick(12000);
+  assert.equal(engine.state.targets.length, 6);
 });
 
 test('countdown does not spend lives or survival time and starts with a target', () => {

@@ -25,13 +25,17 @@ Settings include cursor, pronunciation, sound, interface language and light / da
 
 ## Web game preview
 
-This branch adds a Practice / Game switch. Open `http://127.0.0.1:4173/#game` locally to try it.
+This branch adds a Practice / Game switch. Open `http://127.0.0.1:4173/#game` locally and choose Start.
 
 Chinese characters and words fall from above. Each confirmed input must exactly match one whole target to fire a glowing cursor. Extra characters, partial words and concatenated targets do not match. The input clears after every commit. Each missed target costs one life; the remaining life bars turn red at two lives or fewer, and five misses end the round. Difficulty increases every 30 seconds of survival.
 
-Click Pause or press Escape or Ctrl/Cmd+P to pause, then choose Continue to resume. Leaving the input or hiding the page pauses automatically. Pause to switch modes. During composition, candidate keys stay available to your input method. Game settings explain the controls and difficulty levels. The best score and last 20 round results stay in your browser, separate from practice records. The first game corpus contains 120 Chinese characters and two-character words.
+The initial level uses the earlier preview's level 3 difficulty: a 2.16-second spawn interval, 8.2 seconds for a single-character target to fall, and a six-target limit. Level and combo appear on the left of the HUD, lives in the center, and score on the right. The harder rules have a separate best score, while earlier records are preserved.
 
-The preview is on `codex/falling-words-game`, awaiting playtesting. It has not been merged into `main` or published to the production website. See the [verification record](docs/verification/2026-11-09-falling-words.md) for coverage and limits.
+Click Pause or press Escape or Ctrl/Cmd+P to pause, then choose Continue to resume. Leaving the input or hiding the page pauses automatically. Pause to switch modes. During composition, candidate keys stay available to your input method. Game settings explain the controls and difficulty levels.
+
+Game sounds provide short hit and landing cues. Keyboard sounds reuse practice's four local recording packs: Cherry MX Blue, Cherry MX Brown, NovelKeys Cream and Holy Panda. Keyboard pack, mute and volume choices sync with web practice. Each sound group has its own switch, volume and preview. Pausing, hiding or leaving the game stops playback. The best score and last 20 round results stay in your browser, separate from practice records. The first game corpus contains 120 Chinese characters and two-character words.
+
+The preview is on `codex/falling-words-game`, awaiting playtesting. It has not been merged into `main` or published to the production website. See the [difficulty, layout and audio verification](docs/verification/2026-11-09-falling-words-audio.md) for current coverage and limits.
 
 ## Text and privacy
 
