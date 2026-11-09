@@ -1,3 +1,5 @@
+import { CURSOR_GLOW } from './cursor-style.js';
+
 export const CSS = `
 .tp-root {
   position: relative;
@@ -258,9 +260,7 @@ export const CSS = `
   left: -1px; width: calc(100% + 2px); min-width: .6em; background: transparent; border: 2px solid var(--tp-cursor-color); border-radius: 3px;
 }
 .tp-root[data-cursor-glow="true"] .tp-char.caret::before {
-  box-shadow: 0 0 5px color-mix(in srgb, var(--tp-cursor-color) 50%, transparent),
-    -6px 0 12px 2px color-mix(in srgb, var(--tp-cursor-color) 22%, transparent),
-    6px 0 12px 2px color-mix(in srgb, var(--tp-cursor-color) 22%, transparent);
+  ${CURSOR_GLOW}
 }
 @keyframes tp-cursor-blink { 0%, 45%, 100% { opacity: 1; } 65%, 85% { opacity: .2; } }
 .tp-root[data-cursor-blink="true"] .tp-char.caret::before { animation: tp-cursor-blink 1.2s ease-in-out infinite; }
