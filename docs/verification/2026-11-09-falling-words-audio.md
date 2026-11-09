@@ -55,3 +55,9 @@
 截图：`/tmp/typefeel-game-audio-desktop.png`、`/tmp/typefeel-game-audio-settings.png`、`/tmp/typefeel-game-audio-mobile.png`、`/tmp/typefeel-game-audio-mobile-settings.png`、`/tmp/typefeel-game-audio-play.png`。
 
 本轮为本地分支更新，未合并、推送或发布。原生系统输入法候选窗及真实手机软键盘仍沿用此前的人工验收边界。
+
+## 顶部模式切换居中
+
+「练习 / 游戏」按页面中线居中。桌面使用左右等宽列，窄屏下切换独占顶部一行，品牌与操作区保留在下方。
+
+已检查练习/游戏、中英文及 1280、900、720、390、320px 共 20 种组合：切换控件中心与视口中心偏差小于 1px，不与品牌或操作区重叠，无横向溢出。两种模式的组字/输入流程和 390×400 紧凑视口中的开始按钮、输入区可见性检查通过。较矮窗口收起重复的「落字」标题，保留规则和完整开始按钮。构建及 251 项测试通过。

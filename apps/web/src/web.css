@@ -41,7 +41,19 @@ button, select, input { font: inherit; }
 .tf-mode-switch { flex: none; align-self: center; }
 .tf-mode-switch .tp-seg-btn { min-height: 34px; padding-inline: 13px; }
 .tf-mode-switch .tp-seg-btn:disabled { cursor: default; opacity: .55; }
+#app .tp-header { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; }
+#app .tp-header > .tp-brand { max-width: 100%; }
+#app .tp-header > .tf-mode-switch { justify-self: center; margin: 0; }
+#app .tp-header > .tp-header-actions { justify-self: end; justify-content: flex-end; min-width: 0; max-width: 100%; }
 .tf-loading { margin: 20vh auto; text-align: center; color: var(--tf-label-secondary); }
+@media (max-width: 800px) {
+  #app .tp-header { position: relative; display: flex; flex-wrap: wrap; padding-top: 52px; }
+  #app .tp-header > .tf-mode-switch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); }
+}
+@media (max-height: 450px) {
+  #app .tf-game-root[data-status="ready"] .tf-game-overlay { gap: 4px; }
+  #app .tf-game-root[data-status="ready"] .tf-game-overlay h2 { display: none; }
+}
 @media (max-width: 720px) {
   #app .tp-page { padding-top: 24px; }
   #app .tp-title { font-size: 21px; }
