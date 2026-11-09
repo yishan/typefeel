@@ -51,3 +51,11 @@
 本次验证使用真实 DSH Web 宿主，并非手写宿主模拟页。音频由浏览器原生接口处理。原生操作系统输入法候选窗的位置、真实手机软键盘，以及 DSH 桌面原生菜单向 DOM 的按键转发仍需在对应设备中人工验收；CDP 组字和固定快捷键服务检查不替代这些检查。
 
 浏览器验收脚本及截图保存在 `/tmp/typefeel-dsh-acceptance.cjs`、`/tmp/typefeel-dsh-browser-smoke.cjs`、`/tmp/typefeel-dsh-contrast.cjs` 和 `/tmp/typefeel-dsh-game-*.png`。本地导出包的 `SOURCE.json` 记录准确源码提交。现有安装渠道需经过单独插件发布后才会获得本次功能。
+
+## 光标颜色调整
+
+按用户要求，游戏取消对练习光标颜色的覆盖。发射器、子弹、输入插入光标和光晕共用练习的 `--tp-cursor-color`。
+
+在真实 DSH Web 宿主中比较实际计算颜色：浅色主题下四者与练习光标均为 `rgb(65, 118, 230)`，暗色主题下均为 `rgb(86, 134, 254)`。实际组字确认后检查了发射子弹的颜色，且输入仍正常清空。两种主题下的 390、320px 窄屏检查通过，无浏览器运行时错误。重新构建与 256 项测试均通过。
+
+验证脚本：`/tmp/typefeel-blue-cursor-check.cjs`；截图：`/tmp/typefeel-dsh-game-blue-light.png`、`/tmp/typefeel-dsh-game-blue-dark.png`。

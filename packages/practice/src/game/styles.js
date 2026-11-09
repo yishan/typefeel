@@ -1,7 +1,7 @@
 import { CURSOR_GLOW } from '../cursor-style.js';
 
 export const CSS = `
-.tf-game-root { min-height: 0; --tp-cursor-color: var(--tf-brand-primary); }
+.tf-game-root { min-height: 0; }
 .tf-game-root .tp-scroll { overflow-y: auto; scrollbar-gutter: auto; }
 .tf-game-root .tf-game-page { height: 100%; min-height: 0; gap: 20px; padding-bottom: 16px; }
 .tf-game-root .tp-header { align-items: center; flex-wrap: nowrap; gap: 12px; }
@@ -30,7 +30,7 @@ export const CSS = `
 .tf-game-shot { position: absolute; top: 0; left: 0; height: 18px; transform-origin: center; will-change: transform; }
 .tf-game-emitter { height: 22px; margin: 0 auto 8px; }
 .tf-game-dock { position: relative; flex: none; text-align: center; }
-.tf-game-input { display: block; resize: none; width: min(100%, 340px); height: 45px; margin: 0 auto; border: 0; border-bottom: 1px solid transparent; border-radius: 0; outline: none; background: transparent; padding: 8px 12px; text-align: center; font: inherit; font-size: 20px; line-height: 28px; color: var(--tf-label-primary); caret-color: var(--tf-brand-primary); overflow: hidden; white-space: pre; }
+.tf-game-input { display: block; resize: none; width: min(100%, 340px); height: 45px; margin: 0 auto; border: 0; border-bottom: 1px solid transparent; border-radius: 0; outline: none; background: transparent; padding: 8px 12px; text-align: center; font: inherit; font-size: 20px; line-height: 28px; color: var(--tf-label-primary); caret-color: var(--tp-cursor-color); overflow: hidden; white-space: pre; }
 .tf-game-input::placeholder { color: var(--tf-label-secondary); font-size: 15px; }
 .tf-game-input:focus { border-bottom-color: var(--tf-border-l1); }
 .tf-game-input[aria-invalid="true"] { color: var(--tf-state-error-primary); border-bottom-color: var(--tf-state-error-primary); }
