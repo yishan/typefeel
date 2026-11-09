@@ -23,9 +23,9 @@ Press `Esc` to restart the current passage. Click “New text” to change it. B
 
 Settings include cursor, pronunciation, sound, interface language and light / dark appearance. On first visit the interface follows your browser language (Chinese or English), and appearance follows your system. Your choices are remembered locally.
 
-## Web game preview
+## Web game
 
-This branch adds a Practice / Game switch. Open `http://127.0.0.1:4173/#game` locally and choose Start.
+Choose Practice or Game at the top of the website, then choose Start to begin a round. The local game URL is `http://127.0.0.1:4173/#game`.
 
 Chinese characters and words fall from above. Each confirmed input must exactly match one whole target to fire a glowing cursor. Extra characters, partial words and concatenated targets do not match. The input clears after every commit. Each missed target costs one life; the remaining life bars turn red at two lives or fewer, and five misses end the round. Difficulty increases every 30 seconds of survival.
 
@@ -35,7 +35,7 @@ Click Pause or press Escape or Ctrl/Cmd+P to pause, then choose Continue to resu
 
 Game sounds provide short hit and landing cues. Keyboard sounds reuse practice's four local recording packs: Cherry MX Blue, Cherry MX Brown, NovelKeys Cream and Holy Panda. Keyboard pack, mute and volume choices sync with web practice. Each sound group has its own switch, volume and preview. Pausing, hiding or leaving the game stops playback. The best score and last 20 round results stay in your browser, separate from practice records. The first game corpus contains 120 Chinese characters and two-character words.
 
-The preview is on `codex/falling-words-game`, awaiting playtesting. It has not been merged into `main` or published to the production website. See the [difficulty, layout and audio verification](docs/verification/2026-11-09-falling-words-audio.md) for current coverage and limits.
+See the [difficulty, layout and audio verification](docs/verification/2026-11-09-falling-words-audio.md) for current coverage and limits.
 
 ## Text and privacy
 
