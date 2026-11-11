@@ -1,12 +1,11 @@
 import { createHash } from 'node:crypto';
 import { extractPassages, LENGTHS } from './corpus.js';
 import { TEXT_LENGTHS } from '../../practice/src/passage-lengths.js';
+import { TIMED_CHARS, joinPassageText, pickPassage, pickTimedPassages } from '../../practice/src/prose.js';
 
 const json = (body, status = 200) => Response.json(body, { status, headers: { 'cache-control': 'no-store' } });
 const MONTH = 30 * 24 * 60 * 60 * 1000;
 const RECENT_LIMIT = 16;
-const TIMED_CHARS = 1200; // Same minimum text buffer as built-in timed practice.
-const joinedText = rows => rows.map(item => item.text).join(rows[0]?.language === 'en' ? ' ' : '');
 const fingerprint = /^[a-f0-9]{64}$/;
 
 export function registerCorpusRoutes(ctx) {
@@ -68,29 +67,24 @@ export function registerCorpusRoutes(ctx) {
             }
           } catch (error) { if (signal.aborted) throw error; failures++; }
           finally { observation?.[Symbol.dispose]?.(); }
-          if (candidates.length && (mode === 'passage' || joinedText(candidates).length >= TIMED_CHARS)) { inspected++; break; }
+          if (candidates.length && (mode === 'passage' || joinPassageText(candidates).length >= TIMED_CHARS)) { inspected++; break; }
         }
         cursors.set(cursorKey, (start + inspected) % Math.max(1, rows.length));
         signal.throwIfAborted();
         if (mode === 'timed') {
-          // Prepare complete, distinct passages before starting. Never stall the
-          // clock for another read, repeat a short excerpt, or mix in built-ins.
-          const pool = [...candidates, ...repeats.sort((a, b) => recent.indexOf(a.source.fingerprint) - recent.indexOf(b.source.fingerprint))];
-          const selected = [];
-          for (const item of pool) {
-            selected.push(item);
-            if (joinedText(selected).length >= TIMED_CHARS) break;
+          const selected = pickTimedPassages(candidates, repeats, recent);
+          if (selected) {
+            const text = joinPassageText(selected);
+            return json({ candidate: { language, mode, length: null, text,
+              source: { fingerprint: createHash('sha256').update(text).digest('hex'),
+                fingerprints: selected.map(item => item.source.fingerprint) } } });
           }
-          const text = joinedText(selected);
-          if (text.length >= TIMED_CHARS) return json({ candidate: { language, mode, length: null, text,
-            source: { fingerprint: createHash('sha256').update(text).digest('hex'),
-              fingerprints: selected.map(item => item.source.fingerprint) } } });
           return json({ candidate: null, reason: failures ? 'read_failed' : 'insufficient' });
         }
-        if (candidates.length) return json({ candidate: candidates[Math.floor(Math.random() * candidates.length)] });
         // Exhaust the bounded search for fresh text before reusing the oldest
         // recent match. The current passage remains a hard exclusion.
-        if (repeats.length) return json({ candidate: repeats.sort((a, b) => recent.indexOf(a.source.fingerprint) - recent.indexOf(b.source.fingerprint))[0] });
+        const candidate = pickPassage(candidates, repeats, recent);
+        if (candidate) return json({ candidate });
         return json({ candidate: null, reason: failures ? 'read_failed' : limited || inspected < rows.length ? 'limited' : 'empty' });
       } catch {
         return json({ candidate: null, reason: signal.aborted ? 'timeout' : 'read_failed' });
