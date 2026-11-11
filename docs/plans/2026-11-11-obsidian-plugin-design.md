@@ -126,8 +126,8 @@ Obsidian 内所有笔记库共用一个 `localStorage`，所以偏好和成绩�
 笔记可能含私密内容，所以笔记语料必须先由用户选择文件夹才能使用，默认一个都不选。
 
 - 存储：`data.json` 中的 `{ version: 1, folders: string[] }`。路径先经 `normalizePath()` 处理；读取时丢弃已不存在的文件夹。选择根目录 `/` 等于整个笔记库，需要用户主动选。
-- 入口一（主要）：在字感设置对话框里，通过 `platform.Settings` 增加"笔记文件夹"一节，列出已选文件夹，提供"添加"（弹出 Obsidian 原生的 `FuzzySuggestModal`，候选来自 `getAllFolders()`）和"移除"。
-- 入口二：Obsidian 插件设置页（`PluginSettingTab`）也提供同样的列表，用 `AbstractInputSuggest` 输入提示。两处读写同一份数据，任何一处修改后都通知已打开的视图。
+- 入口一（主要）：在字感设置对话框里，通过 `platform.Settings` 增加"笔记文件夹"一节，列出已选文件夹，可以移除；添加用原生输入框加 `<datalist>`，候选来自 `getAllFolders()`。这个对话框是用 `showModal()` 打开的，Obsidian 的弹窗会被压在它下面无法操作，所以这里不用 `FuzzySuggestModal`。
+- 入口二：Obsidian 插件设置页（`PluginSettingTab`）提供同样的列表，"添加文件夹"打开 `FuzzySuggestModal`。两处读写同一份数据，任何一处修改后都通知已打开的视图。
 - 没有选文件夹时切到"我的笔记"：`fetchCorpus` 返回 `reason: 'unconfigured'`。共享代码目前把未知原因一律显示为 `corpusUnavailable`，这里给它加一个分支：`unconfigured` 显示 `corpusUnconfigured` 文案（Obsidian 版为"请先在设置中选择用于练习的笔记文件夹，已使用默认语料。"）。网页和 DSH 不会返回这个原因，行为不变。
 - 文件夹重命名或删除：监听 `vault.on('rename')` 更新路径，`delete` 时移除。
 
@@ -148,7 +148,9 @@ Obsidian 内所有笔记库共用一个 `localStorage`，所以偏好和成绩�
 
 ### 用选中内容练习
 
-编辑器右键菜单和命令"用选中内容练习"：把选中文字按当前语言切分后直接作为练习文本打开。这需要共享代码提供一个从外部传入文本的入口（现在只有用户点"换一段"时才调用 `fetchCorpus`）。方案是在 `createPractice` 的返回值中增加 `startWithText(text, source)`，网页和 DSH 不使用，不影响它们。与 `unconfigured` 提示一起，是共享代码仅有的两处行为扩展，都放在第三阶段。
+编辑器右键菜单和命令"用选中内容练习"：先清理 Obsidian 语法，再按内容判断语言（英文、粤语或普通话）。共享的 `selectionPassage` 保留从开头起连续的、可以输入的句子，最长到"长"档上限，再按长度自动归到短、中、长中的一档；太短或含疑似隐私内容时提示无法练习。
+
+共享代码新增 `startWithText(request)`（`createPractice` 的返回值）。请求在练习页挂载前先暂存，挂载后由最新的练习页接收；这一轮标记为"交接文本"，不会被"本地语料"的自动刷新替换，用户点"换一段"后才回到笔记语料。网页和 DSH 不调用它。与 `unconfigured` 提示一起，是共享代码仅有的两处行为扩展。
 
 ## 构建
 

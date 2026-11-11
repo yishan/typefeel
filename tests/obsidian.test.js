@@ -15,16 +15,28 @@ const dist = fileURLToPath(new URL('../dist/obsidian-plugin/', import.meta.url))
 const source = fileURLToPath(new URL('../packages/obsidian-plugin/', import.meta.url));
 
 // A minimal stand-in for Obsidian's module: records what the plugin registers.
-function loadPlugin(code, language = 'zh') {
-  const registered = { views: [], commands: [], ribbons: [] };
-  class Component {}
+function loadPlugin(code, language = 'zh', data = null) {
+  const registered = { views: [], commands: [], ribbons: [], events: [], settingTabs: [] };
+  class Component { registerEvent(ref) { registered.events.push(ref); } }
   class ItemView extends Component { constructor(leaf) { super(); this.leaf = leaf; } getState() { return {}; } async setState() {} }
   class Plugin extends Component {
+    constructor() {
+      super();
+      const on = (target, name) => `${target}:${name}`;
+      this.app = { workspace: { on: name => on('workspace', name) }, vault: { on: name => on('vault', name) } };
+    }
     registerView(type, create) { registered.views.push({ type, create }); }
     addCommand(command) { registered.commands.push(command); return command; }
     addRibbonIcon(icon, title, callback) { registered.ribbons.push({ icon, title, callback }); }
+    addSettingTab(tab) { registered.settingTabs.push(tab); }
+    async loadData() { return data; }
   }
-  const obsidian = { ItemView, Plugin, getLanguage: () => language };
+  class PluginSettingTab { constructor(app, plugin) { this.app = app; this.plugin = plugin; this.containerEl = {}; } }
+  class FuzzySuggestModal {}
+  class Setting {}
+  class Notice {}
+  class TFolder {}
+  const obsidian = { ItemView, Plugin, PluginSettingTab, FuzzySuggestModal, Setting, Notice, TFolder, getLanguage: () => language };
   const module = { exports: {} };
   const context = { module, exports: module.exports, require: name => {
     assert.equal(name, 'obsidian', `unexpected runtime require: ${name}`);
@@ -49,13 +61,18 @@ test('Obsidian package ships the three installable files with a valid manifest',
 test('loading the Obsidian plugin evaluates only the shell and registers a view, ribbon and commands', async () => {
   const code = await readFile(dist + 'main.js', 'utf8');
   // No window or document here: the React app must not run until a view opens.
-  const { Plugin, registered } = loadPlugin(code, 'zh-TW');
+  const { Plugin, registered } = loadPlugin(code, 'zh-TW', { folders: ['/Notes/', 'Notes', 7] });
   const plugin = new Plugin();
   await plugin.onload();
   assert.deepEqual(registered.views.map(view => view.type), [platform.VIEW_TYPE]);
-  assert.deepEqual(registered.commands.map(command => command.id), ['open-practice', 'open-game']);
+  assert.deepEqual(registered.commands.map(command => command.id), ['open-practice', 'open-game', 'practice-selection']);
   assert.ok(registered.commands.every(command => !command.hotkeys), 'community plugins must not set default hotkeys');
-  assert.deepEqual(registered.commands.map(command => command.name), [platform.commandNames.zh.practice, platform.commandNames.zh.game]);
+  assert.deepEqual(registered.commands.map(command => command.name),
+    [platform.commandNames.zh.practice, platform.commandNames.zh.game, platform.commandNames.zh.selection]);
+  assert.equal(typeof registered.commands[2].editorCallback, 'function', 'selection practice needs an editor');
+  assert.deepEqual(registered.events, ['workspace:editor-menu', 'vault:rename', 'vault:delete']);
+  assert.equal(registered.settingTabs.length, 1);
+  assert.deepEqual({ ...plugin.settings, folders: [...plugin.settings.folders] }, { version: 1, folders: ['Notes'] });
   assert.deepEqual(registered.ribbons.map(ribbon => [ribbon.icon, ribbon.title]), [['keyboard', platform.commandNames.zh.ribbon]]);
   const view = registered.views[0].create({});
   assert.equal(view.getViewType(), platform.VIEW_TYPE);

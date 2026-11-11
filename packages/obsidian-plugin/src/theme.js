@@ -29,6 +29,15 @@ export const obsidianTheme = `.tp-root[data-platform="obsidian"] {
 .tp-root[data-platform="obsidian"] input[type="range"] { appearance: auto; background: transparent; border-radius: 0; }
 .tp-root[data-platform="obsidian"] input[type="range"]::-webkit-slider-runnable-track { appearance: auto; height: auto; }
 .tp-root[data-platform="obsidian"] input[type="range"]::-webkit-slider-thumb { appearance: auto; }
+/* Note folders section in the practice settings dialog. */
+.tf-folders-hint, .tf-folders-empty { margin: 0 0 12px; color: var(--tf-label-secondary); font-size: 12px; line-height: 1.7; }
+.tf-folder-list { display: grid; gap: 6px; margin: 0 0 12px; padding: 0; list-style: none; }
+.tf-folder-list li { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-width: 0; padding-left: 12px; border: 1px solid var(--tf-border-l1); border-radius: 8px; }
+.tf-folder-path { min-width: 0; overflow-wrap: anywhere; font-size: 13px; }
+.tf-folder-add { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.tf-folder-add .tp-sound-field { flex: 1; }
+.tf-folder-input { width: 100%; min-width: 0; height: 36px; padding: 0 10px; border: 1px solid var(--tf-border-l1); border-radius: 8px; background: var(--tf-bg-layer-1); color: var(--tf-label-primary); font: inherit; font-size: 13px; }
+.tf-folder-input:focus-visible { outline: 2px solid var(--tf-label-primary); outline-offset: 2px; }
 ${containedLayout('obsidian')}`;
 
 // styles.css: the shared page styles and this theme, scoped to the view host.

@@ -45,6 +45,21 @@ export function createPractice(React, platform) {
     const localeService = platform.locale;
     const getShortcuts = () => platform.shortcuts?.();
 
+    // Text a host hands over to practise now, such as an Obsidian selection.
+    // Held until a practice page is mounted; the newest page receives it.
+    let pendingText = null;
+    let textListener = null;
+    function startWithText(request) {
+      const valid = request && LANGUAGES.includes(request.language) && PracticeCorpus.TEXT_LENGTHS.includes(request.length)
+        && typeof request.text === 'string' && request.text.trim().length > 0 && request.text.length <= 3000
+        && /^[a-f0-9]{64}$/.test(request.source?.fingerprint || '') && typeof request.source?.sessionId === 'string';
+      if (!valid) return false;
+      const next = { language: request.language, length: request.length, text: request.text,
+        source: { ...request.source, handedOver: true } };
+      if (textListener) textListener(next); else pendingText = next;
+      return true;
+    }
+
     function interpolate(text, vars) {
       return String(text == null ? '' : text).replace(/\{(\w+)\}/g, (match, key) => {
         if (vars && vars[key] != null) return String(vars[key]);
@@ -922,8 +937,23 @@ export function createPractice(React, platform) {
       // A remembered local source also applies when the page is reopened or
       // the practice language changes, until a failed selection falls back.
       React.useEffect(() => {
-        if (corpusPreference === 'local') nextPassage(false);
+        // Handed-over text stays until the person asks for another passage.
+        if (corpusPreference === 'local' && !sessionRef.current.source?.handedOver) nextPassage(false);
       }, [corpusPreference, session.language, session.mode, session.length, session.duration]);
+
+      const handOverRef = React.useRef(null);
+      handOverRef.current = request => {
+        const exercise = exerciseFor(request.length);
+        setExercisePreference(exercise);
+        restart(exercise.duration, true, request.language, request.language === 'en' ? 'off' : hintPreference.mode,
+          request.text, request.source, exercise);
+      };
+      React.useEffect(() => {
+        const listener = request => handOverRef.current(request);
+        textListener = listener;
+        if (pendingText) { const request = pendingText; pendingText = null; listener(request); }
+        return () => { if (textListener === listener) textListener = null; };
+      }, []);
 
       function changeCorpusPreference(source) {
         if (!['builtin', 'local'].includes(source) || source === corpusPreference) return;
@@ -983,7 +1013,8 @@ export function createPractice(React, platform) {
               && item.source.fingerprints.every(id => typeof id === 'string' && /^[a-f0-9]{64}$/.test(id))
               : item.mode !== 'timed' && (item.length == null ? current.length === 'short' : item.length === current.length))
             && item.text.length <= 3000 && (current.mode === 'timed' ? /^[a-f0-9]{64}$/.test(item.source?.fingerprint || '') : item.source?.sessionId)) candidate = item;
-          if (!candidate && !['empty', 'limited', 'insufficient'].includes(body.reason)) fallback = 'corpusUnavailable';
+          if (!candidate && body.reason === 'unconfigured') fallback = 'corpusUnconfigured';
+          else if (!candidate && !['empty', 'limited', 'insufficient'].includes(body.reason)) fallback = 'corpusUnavailable';
         } catch { fallback = 'corpusUnavailable'; }
         finally { clearTimeout(timeout); }
         if (corpusRequest.current !== controller || sessionRef.current.id !== current.id) return;
@@ -1625,5 +1656,5 @@ export function createPractice(React, platform) {
       );
     }
 
-    return { TypingPage, PanelIcon, CSS, t };
+    return { TypingPage, PanelIcon, CSS, t, startWithText };
 }

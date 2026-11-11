@@ -1,5 +1,5 @@
 import { fromMarkdown } from 'mdast-util-from-markdown';
-import { LENGTHS, measure, normalizeText, hasUnsupportedCharacters, qualityIssues } from './text-policy.js';
+import { LENGTHS, measure, matchesLanguage, normalizeText, hasUnsupportedCharacters, qualityIssues } from './text-policy.js';
 import { PASSAGE_LENGTHS, TEXT_LENGTHS } from './passage-lengths.js';
 
 // Turns a person's own Markdown into practice passages. Shared by every local
@@ -98,4 +98,34 @@ export function pickTimedPassages(fresh, repeats, recent, minChars = TIMED_CHARS
 export function pickPassage(fresh, repeats, recent, random = Math.random) {
   if (fresh.length) return fresh[Math.floor(random() * fresh.length)];
   return repeats.length ? byRecentUse(repeats, recent)[0] : null;
+}
+
+// A person's own selection is practised as one passage. It need not be a
+// complete, balanced excerpt, but every kept sentence must be typeable.
+const SELECTION_MIN = { en: 5, zh: 10, yue: 10 };
+
+export function selectionLanguage(text) {
+  return ['en', 'yue', 'zh'].find(language => matchesLanguage(text, language)) ?? null;
+}
+
+// The first contiguous run of typeable sentences, capped at a long passage.
+// Returns { text, length } or null when nothing practicable is selected.
+export function selectionPassage(text, language) {
+  if (!Object.hasOwn(LENGTHS, language)) throw new Error('invalid_options');
+  text = normalizeText(text, language);
+  if (unsuitable.test(text)) return null;
+  const max = PASSAGE_LENGTHS.long[language][1];
+  const separator = language === 'en' ? ' ' : '';
+  const kept = [];
+  for (const part of sentences.segment(text)) {
+    const sentence = part.segment.trim();
+    if (!sentence) continue;
+    if (hasUnsupportedCharacters(sentence, language)) { if (kept.length) break; continue; }
+    if (measure([...kept, sentence].join(separator), language) > max) break;
+    kept.push(sentence);
+  }
+  const passage = kept.join(separator);
+  const count = measure(passage, language);
+  if (count < SELECTION_MIN[language]) return null;
+  return { text: passage, length: TEXT_LENGTHS.find(length => count <= PASSAGE_LENGTHS[length][language][1]) };
 }
