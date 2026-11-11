@@ -484,11 +484,23 @@ export function createPractice(React, platform) {
       const rect = anchor.getBoundingClientRect();
       const left = Math.max(12, Math.min(rect.left, bounds.right - 4, window.innerWidth - 16));
       const top = Math.max(12, Math.min(rect.top, bounds.bottom - 24, window.innerHeight - 28));
-      input.style.left = `${left}px`;
-      input.style.top = `${top}px`;
-      if (preview) {
-        preview.style.left = `${Math.min(left, Math.max(12, window.innerWidth - 160))}px`;
-        preview.style.top = `${Math.min(top + rect.height + 2, window.innerHeight - 48)}px`;
+      placeFixed(input, left, top);
+      if (preview) placeFixed(preview, Math.min(left, Math.max(12, window.innerWidth - 160)), Math.min(top + rect.height + 2, window.innerHeight - 48));
+    }
+
+    // Places a position: fixed element at viewport coordinates. A pane host
+    // (the container query on .tp-root, Obsidian's contained leaves) becomes
+    // the containing block of fixed elements; correct by the measured offset so
+    // the native IME window opens at the caret.
+    function placeFixed(element, left, top) {
+      element.style.left = `${left}px`;
+      element.style.top = `${top}px`;
+      const placed = element.getBoundingClientRect();
+      const dx = placed.left - left;
+      const dy = placed.top - top;
+      if (Math.abs(dx) >= 0.5 || Math.abs(dy) >= 0.5) {
+        element.style.left = `${left - dx}px`;
+        element.style.top = `${top - dy}px`;
       }
     }
 

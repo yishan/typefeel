@@ -59,14 +59,32 @@ test('reflow and a fresh run reset the tracked row without retaining a stale scr
   assert.doesNotThrow(() => context.revealCaret(null));
 });
 
+// A position: fixed element whose containing block starts at `offset`: the
+// viewport on the website, a contained pane in DSH and Obsidian.
+function fixedElement(offset = { left: 0, top: 0 }) {
+  const style = {};
+  return { style, getBoundingClientRect: () => ({ left: parseFloat(style.left) + offset.left, top: parseFloat(style.top) + offset.top }) };
+}
+
 test('the native IME input and composition preview follow the pinned visual anchor', () => {
   const { viewport, state, anchor } = scene(56.7);
-  const input = { style: {} }, preview = { style: {} };
+  const input = fixedElement(), preview = fixedElement();
   for (const row of [0, 1, 19, 8]) {
     state.row = row; context.revealCaret(viewport); context.positionInput(viewport, input, preview);
     assert.equal(parseFloat(input.style.top), anchor.getBoundingClientRect().top);
     assert.equal(parseFloat(input.style.left), anchor.getBoundingClientRect().left);
     assert.equal(parseFloat(preview.style.top), anchor.getBoundingClientRect().top + 26);
+  }
+});
+
+test('the IME anchor stays at the caret when a contained pane is the containing block', () => {
+  const { viewport, state, anchor } = scene(56.7);
+  const offset = { left: 270, top: 60 };
+  const input = fixedElement(offset), preview = fixedElement(offset);
+  for (const row of [0, 3, 8]) {
+    state.row = row; context.revealCaret(viewport); context.positionInput(viewport, input, preview);
+    assert.deepEqual(input.getBoundingClientRect(), { left: anchor.getBoundingClientRect().left, top: anchor.getBoundingClientRect().top });
+    assert.equal(preview.getBoundingClientRect().top, anchor.getBoundingClientRect().top + 26);
   }
 });
 

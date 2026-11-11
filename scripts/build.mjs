@@ -4,12 +4,16 @@ import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { resolve, relative } from 'node:path';
 import { validateCorpus } from './check-corpus.mjs';
+import { CSS as practiceCSS } from '../packages/practice/src/styles.js';
+import { CSS as gameCSS } from '../packages/practice/src/game/styles.js';
+import { obsidianStyles } from '../packages/obsidian-plugin/src/theme.js';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const pluginRoot = resolve(root, 'packages/dsh-plugin');
 const pluginManifest = JSON.parse(await readFile(resolve(pluginRoot, 'package.json'), 'utf8'));
-const onlyWeb = process.argv.includes('--web');
-const onlyPlugin = process.argv.includes('--plugin');
+const selected = ['--web', '--plugin', '--obsidian'].filter(flag => process.argv.includes(flag));
+const builds = { web: !selected.length || selected.includes('--web'), plugin: !selected.length || selected.includes('--plugin'),
+  obsidian: !selected.length || selected.includes('--obsidian') };
 const dependencies = new Set();
 const graphs = {};
 console.log('Corpus:', validateCorpus());
@@ -32,6 +36,10 @@ for (const file of audioManifest.files.filter(item => item.path.endsWith('.mp3')
 }
 const audioSource = `export { createAudioPlayer } from './packages/practice/src/audio-player.js';\nexport const samples = ${JSON.stringify(samples)};`;
 const browserOptions = { absWorkingDir: root, bundle: true, platform: 'browser', target: 'es2022', charset: 'utf8', legalComments: 'inline', metafile: true };
+const bundledAudio = { name: 'bundled-audio', setup(builder) {
+  builder.onResolve({ filter: /^typefeel:audio$/ }, () => ({ path: 'audio', namespace: 'typefeel' }));
+  builder.onLoad({ filter: /.*/, namespace: 'typefeel' }, () => ({ contents: audioSource, resolveDir: root, loader: 'js' }));
+} };
 
 async function pluginBuild() {
   const out = resolve(root, 'dist/dsh-plugin');
@@ -73,13 +81,10 @@ async function webBuild() {
     format: 'esm', splitting: true, minify: true, outdir: resolve(out, 'assets'),
     entryNames: '[name]-[hash]', chunkNames: '[name]-[hash]', assetNames: '[name]-[hash]',
     define: { 'process.env.NODE_ENV': '"production"' },
-    plugins: [{ name: 'bundled-audio', setup(builder) {
-      builder.onResolve({ filter: /^typefeel:audio$/ }, () => ({ path: 'audio', namespace: 'typefeel' }));
-      builder.onLoad({ filter: /.*/, namespace: 'typefeel' }, () => ({ contents: audioSource, resolveDir: root, loader: 'js' }));
-    } }],
+    plugins: [bundledAudio],
   });
   track(result, 'web');
-  if (graphs.web.some(path => /packages\/dsh-plugin\//.test(path))) throw new Error('Web build includes DSH Host code');
+  if (graphs.web.some(path => /packages\/(?:dsh-plugin|obsidian-plugin)\//.test(path))) throw new Error('Web build includes plugin adapter code');
   const entry = Object.entries(result.metafile.outputs).find(([, meta]) => meta.entryPoint === 'apps/web/src/main.js');
   if (!entry) throw new Error('Missing web entry');
   const script = '/' + relative(out, resolve(root, entry[0]));
@@ -90,8 +95,34 @@ async function webBuild() {
   await cp(resolve(root, 'LICENSE'), resolve(out, 'LICENSE.txt'));
 }
 
-if (!onlyWeb) await pluginBuild();
-if (!onlyPlugin) await webBuild();
+// Obsidian installs only main.js, manifest.json and styles.css, so everything
+// is one CommonJS file. Dynamic imports stay lazy: esbuild defers evaluating
+// those modules until first use.
+async function obsidianBuild() {
+  const source = resolve(root, 'packages/obsidian-plugin');
+  const out = resolve(root, 'dist/obsidian-plugin');
+  await rm(out, { recursive: true, force: true });
+  await mkdir(out, { recursive: true });
+  const result = await build({ ...browserOptions, entryPoints: ['packages/obsidian-plugin/src/main.js'],
+    format: 'cjs', minify: true, write: false, loader: { '.svg': 'dataurl' },
+    external: ['obsidian'], define: { 'process.env.NODE_ENV': '"production"' }, plugins: [bundledAudio] });
+  track(result, 'obsidian');
+  if (graphs.obsidian.some(path => /packages\/dsh-plugin\/|apps\/web\//.test(path))) throw new Error('Obsidian build includes another adapter');
+  if (graphs.obsidian.some(path => path.startsWith('node:'))) throw new Error('Obsidian build uses Node APIs');
+  for (const output of Object.values(result.metafile.outputs)) {
+    if (output.imports.some(item => item.path !== 'obsidian')) throw new Error('External Obsidian runtime dependency');
+  }
+  const code = result.outputFiles[0].text;
+  if (/\(\?<[=!]/.test(code)) throw new Error('Regular expression lookbehind is unsupported before iOS 16.4');
+  await writeFile(resolve(out, 'main.js'), '// Generated from typefeel; do not edit. Source: https://github.com/yishan/typefeel\n' + code);
+  await writeFile(resolve(out, 'styles.css'), '/* Generated from typefeel; do not edit. */\n' + obsidianStyles(practiceCSS + gameCSS));
+  await cp(resolve(source, 'manifest.json'), resolve(out, 'manifest.json'));
+  await cp(resolve(root, 'LICENSE'), resolve(out, 'LICENSE'));
+}
+
+if (builds.plugin) await pluginBuild();
+if (builds.web) await webBuild();
+if (builds.obsidian) await obsidianBuild();
 let notices = '# Third-party notices\n\nType Feel is MIT licensed. Practice passages are original. Libraries and keyboard recordings are bundled with the application; no runtime CDN is used.\n';
 for (const name of [...dependencies].sort()) {
   const directory = resolve(root, 'node_modules', name);
@@ -101,7 +132,8 @@ for (const name of [...dependencies].sort()) {
   notices += `\n## ${name} ${manifest.version}\n\n${await readFile(resolve(directory, license), 'utf8')}\n`;
 }
 notices += `\n## kbsim keyboard recordings\n\n${audioManifest.repository}/tree/${audioManifest.revision}/src/assets/audio\n\n${await readFile(resolve(root, 'assets/audio/kbsim/LICENSE.md'), 'utf8')}\n`;
-if (!onlyWeb) await writeFile(resolve(root, 'dist/dsh-plugin/THIRD_PARTY_NOTICES.md'), notices);
-if (!onlyPlugin) await writeFile(resolve(root, 'dist/web/THIRD_PARTY_NOTICES.txt'), notices);
+if (builds.plugin) await writeFile(resolve(root, 'dist/dsh-plugin/THIRD_PARTY_NOTICES.md'), notices);
+if (builds.web) await writeFile(resolve(root, 'dist/web/THIRD_PARTY_NOTICES.txt'), notices);
+if (builds.obsidian) await writeFile(resolve(root, 'dist/obsidian-plugin/THIRD_PARTY_NOTICES.md'), notices);
 await writeFile(resolve(root, 'dist/build-inputs.json'), JSON.stringify(graphs, null, 2) + '\n');
 console.log('Built', Object.keys(graphs).join(', '));

@@ -1,0 +1,45 @@
+# Obsidian 插件第二阶段验证
+
+日期：2026-11-11。范围：最小可用版本（视图、主题、内置语料练习、落字游戏、命令、构建目标）。设计见 `docs/plans/2026-11-11-obsidian-plugin-design.md`。
+
+## 环境
+
+- Obsidian 1.15.1（app 包），安装器 1.6.3（Electron 28 / Chromium 120），macOS。
+- 独立的用户数据目录和临时笔记库（`/tmp/typefeel-obsidian`），插件目录软链接到 `dist/obsidian-plugin`；没有使用或修改日常笔记库。
+- 通过 `--remote-debugging-port` 用 CDP 驱动和截图。
+
+## 自动检查
+
+- `npm run build`：网页、DSH、Obsidian 三个目标都构建成功。Obsidian 产物：`main.js` 1.34 MB，唯一外部依赖为 `obsidian`；`styles.css` 由共享样式加主题生成。
+- `npm test`：269 项全部通过。新增 `tests/obsidian.test.js`（清单、插件注册、语言映射、存储键、样式作用域、产物隔离），以及 `tests/viewport.test.js` 中"面板容器偏移下输入法锚点"的用例。
+- DSH 生成的 CSS 与改动前逐字节相同（面板布局抽到 `packages/practice/src/host-layout.js` 后）。
+
+## 实机检查结果
+
+| 项目 | 结果 |
+|---|---|
+| 插件加载、侧边栏图标、两个命令 | 正常；命令无默认快捷键 |
+| 加载时只执行插件外壳 | 正常；React 应用在首次打开视图时才加载 |
+| 英文练习、Esc 重新开始 | 正常 |
+| 中文、粤语练习；拼音、粤拼按需加载 | 正常（中文 1120 个注音，粤语注音首项 `hoi1`） |
+| 模拟输入法组字（`Input.imeSetComposition`）与上屏 | 正常；修复后输入框和组字预览贴在光标下方 |
+| 落字游戏开始、击中、Esc 暂停与继续 | 正常 |
+| "打开落字游戏"命令复用已打开的标签页 | 正常 |
+| 设置、成绩对话框；键盘音效五套切换与试听 | 正常 |
+| 深色、浅色主题 | 跟随 Obsidian 主题变量 |
+| 窄视图（窗口 760px） | 标题区换行，模式切换移到顶部居中 |
+| 停用插件 | 视图内容和样式全部移除；标签页按 Obsidian 规范保留 |
+| 渲染进程报错收集 | 无 |
+
+## 发现并修复的问题
+
+1. **Obsidian 全局控件样式覆盖共享样式。** `button:not(.clickable-icon)`、`textarea:focus`、`input[type=range]`、复选框 `::after` 的优先级高于共享的单类名规则，导致分段按钮出现底色、游戏输入框聚焦时出现边框、音量滑块变成整块、开关多出勾选标记。处理：构建时给共享样式的每个选择器加 `.typefeel-host` 前缀（`packages/obsidian-plugin/src/scope-css.js`），并在 Obsidian 主题中去掉控件的 `box-shadow`、复选框 `::after`，滑块恢复原生外观。共享源码不变。
+2. **输入法锚点在面板宿主中偏移。** 共享面板布局给 `.tp-root` 设置了 `container-type: inline-size`，Obsidian 标签页还有 `contain: strict`，两者都会成为 `position: fixed` 元素的包含块，按视口坐标放置的输入框和组字预览因此偏移了面板在窗口中的位置。处理：共享的 `positionInput` 放置后测量实际位置并校正偏差。网页中偏差为 0，行为不变；DSH 使用同一面板布局，预计也受益，但未在 DSH 宿主中实测。
+
+## 未覆盖或待处理
+
+- **真实输入法候选框位置**：CDP 只能模拟组字，不能证明系统输入法候选窗的位置，需要用真实的中文、粤语输入法人工确认。模拟组字时，在统计数字下方出现过一段紫色短线，DOM 中没有对应元素，且位置不随输入框移动，判断为模拟组字的原生绘制痕迹。
+- **游戏中的 Cmd/Ctrl+P**：会同时暂停游戏并打开 Obsidian 命令面板。按设计在第四阶段用视图 `Scope` 处理。
+- **一次渲染进程崩溃**：在设置对话框中切换键盘音效后，渲染进程在 Chromium 字体代码（skrifa/fontations）中发生空指针访问。重启后连续三轮相同和更多操作均未复现。安装器为 1.6.3（Electron 28），较新的安装器尚未测试。
+- **DSH 宿主**：本阶段改动了共享的输入法锚点定位和面板布局的引用方式，DSH 未在真实宿主中回归。
+- **手机端**：未测试。
