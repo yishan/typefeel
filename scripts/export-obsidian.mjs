@@ -19,10 +19,12 @@ for (const file of ['README.md', 'README.zh-CN.md', 'versions.json']) await cp(r
 // Include source files required to build main.js and styles.css
 await mkdir(resolve(destination, 'packages/obsidian-plugin/src'), { recursive: true });
 await cp(resolve(pluginRoot, 'src'), resolve(destination, 'packages/obsidian-plugin/src'), { recursive: true });
+await cp(resolve(pluginRoot, 'icon.svg'), resolve(destination, 'packages/obsidian-plugin/icon.svg'));
 await mkdir(resolve(destination, 'packages/practice/src'), { recursive: true });
 await cp(resolve(root, 'packages/practice/src'), resolve(destination, 'packages/practice/src'), { recursive: true });
 await mkdir(resolve(destination, 'data'), { recursive: true });
 await cp(resolve(root, 'data/passages.json'), resolve(destination, 'data/passages.json'));
+await cp(resolve(root, 'data/game-words.json'), resolve(destination, 'data/game-words.json'));
 await mkdir(resolve(destination, 'assets/audio/kbsim'), { recursive: true });
 await cp(resolve(root, 'assets/audio/kbsim'), resolve(destination, 'assets/audio/kbsim'), { recursive: true });
 
