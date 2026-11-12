@@ -4,6 +4,7 @@ import { HOST_CLASS } from './platform.js';
 
 // Follow the user's Obsidian theme, light or dark, including community themes.
 export const obsidianTheme = `.tp-root[data-platform="obsidian"] {
+  --tp-font-mono: var(--font-monospace, monospace);
   --tf-bg-base: var(--background-primary);
   --tf-bg-layer-1: var(--background-secondary);
   --tf-bg-layer-2: var(--interactive-normal);

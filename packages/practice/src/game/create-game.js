@@ -224,7 +224,7 @@ export function createGamePage(React, platform = {}) {
       inside: Boolean(rootRef.current?.contains(document.activeElement)), dialogOpen: settingsOpen, pause,
     });
     React.useEffect(() => {
-      const release = reserveGamePauseShortcut(platform.shortcuts?.(), /Mac|iPhone|iPad/.test(window.navigator?.platform || ''), t.pause);
+      const release = reserveGamePauseShortcut(platform.shortcuts?.(), Boolean(platform.isApple), t.pause);
       const keydown = event => keyboardRef.current(event);
       window.addEventListener('keydown', keydown, true);
       return () => { window.removeEventListener('keydown', keydown, true); release?.(); };
@@ -252,12 +252,12 @@ export function createGamePage(React, platform = {}) {
             onClick: () => { if (keyboard) void audioRef.current.previewKeyboard(); else void audioRef.current.previewEffects(); } }, t.preview),
           h('label', { className: 'tp-cursor-toggle' }, h('input', { type: 'checkbox', role: 'switch', 'aria-label': title,
             checked: preference.enabled, onChange: event => changeAudio(group, { enabled: event.currentTarget.checked }) }))),
-        keyboard ? h('label', { className: 'tp-sound-field' }, h('span', null, t.keyboardPack),
+        keyboard ? h('label', { className: 'tp-sound-field' + (!preference.enabled ? ' is-disabled' : '') }, h('span', null, t.keyboardPack),
           h('span', { className: 'tp-select' }, h('select', { 'aria-label': language === 'zh' ? '键盘声音' : 'Keyboard sound',
             value: preference.pack, disabled: !preference.enabled, onChange: event => changeAudio(group, { pack: event.currentTarget.value }) },
             ...KEYBOARD_PACKS.map(pack => h('option', { key: pack, value: pack }, soundCopy['sound_' + pack]))),
           h('svg', { className: 'tp-select-chevron', viewBox: '0 0 12 12', fill: 'none', stroke: 'currentColor', strokeWidth: 1.5, 'aria-hidden': true }, h('path', { d: 'M3 4.5 6 7.5 9 4.5' })))) : null,
-        h('label', { className: 'tp-sound-field' }, h('span', null, t.volume), h('span', { className: 'tp-sound-volume' },
+        h('label', { className: 'tp-sound-field' + (!preference.enabled ? ' is-disabled' : '') }, h('span', null, t.volume), h('span', { className: 'tp-sound-volume' },
           h('input', { type: 'range', min: 0, max: 100, step: 5, value: preference.volume, disabled: !preference.enabled,
             'aria-label': `${title}${language === 'zh' ? '' : ' '}${t.volume}`, 'aria-valuetext': `${preference.volume}%`,
             onChange: event => changeAudio(group, { volume: Number(event.currentTarget.value) }) }), h('output', { 'aria-hidden': true }, `${preference.volume}%`))),

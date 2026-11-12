@@ -662,7 +662,7 @@ export function createPractice(React, platform) {
       const [corpusBusy, setCorpusBusy] = React.useState(false);
       const [toast, setToast] = React.useState(null);
       const toastSequence = React.useRef(0);
-      const [isApple] = React.useState(() => /Mac|iPhone|iPad|iPod/i.test(window.navigator?.userAgentData?.platform || window.navigator?.platform || ''));
+      const [isApple] = React.useState(() => Boolean(platform.isApple));
       React.useEffect(() => {
         if (!toast) return undefined;
         const timer = window.setTimeout(() => setToast(null), 3000);
@@ -1296,7 +1296,7 @@ export function createPractice(React, platform) {
                     'aria-pressed': hintPreference.pinyinFormat === format,
                     onClick: () => changeHints({ pinyinFormat: format }),
                   }, t('pinyin_' + format))))),
-              h('label', { className: 'tp-sound-field' }, h('span', null, t('shuangpinScheme')),
+              h('label', { className: 'tp-sound-field' + (!isShuangpin ? ' is-disabled' : '') }, h('span', null, t('shuangpinScheme')),
                 h('span', { className: 'tp-select' }, h('select', {
                   value: hintPreference.pinyinScheme, disabled: !isShuangpin, 'aria-label': t('shuangpinScheme'),
                   'aria-describedby': 'tp-pinyin-note', onChange: event => changeHints({ pinyinScheme: event.currentTarget.value }),

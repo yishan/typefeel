@@ -73,7 +73,7 @@ export const CSS = `
   .tf-game-target { font-size: 25px; }
 }
 @media (max-width: 360px) { .tf-game-root .tp-header { flex-wrap: wrap; gap: 8px; } .tf-game-root .tp-header-actions { margin-inline-start: auto; } }
-.tf-game-root[data-compact="true"] .tf-game-page { padding-top: 12px !important; padding-bottom: 8px !important; gap: 8px !important; }
+.tp-root.tf-game-root[data-compact="true"] .tf-game-page { padding-top: 12px; padding-bottom: 8px; gap: 8px; }
 .tf-game-root[data-compact="true"] .tp-subtitle { display: none; }
 .tf-game-root[data-compact="true"] .tf-game-stage { min-height: 70px; }
 .tf-game-root[data-compact="true"] .tf-game-stats { padding: 0; }

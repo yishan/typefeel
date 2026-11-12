@@ -49,16 +49,16 @@ export const commandNames = {
     noSelection: 'Select the text you want to practice first.', unsuitable: 'This selection cannot be practiced. Select at least one typeable sentence in Chinese, Cantonese or English.' },
 };
 
-export function practiceOptions({ locale, brandIconUrl, Navigation, loadPronunciation, loadAudio, fetchCorpus, Settings }) {
+export function practiceOptions({ isApple, locale, brandIconUrl, Navigation, loadPronunciation, loadAudio, fetchCorpus, Settings }) {
   return {
-    id: 'obsidian', storagePrefix: STORAGE_PREFIX, fullShortcuts: false,
+    id: 'obsidian', storagePrefix: STORAGE_PREFIX, fullShortcuts: false, isApple,
     locale, copy, brandIconUrl, Navigation, loadPronunciation, loadAudio, fetchCorpus, Settings,
   };
 }
 
-export function gameOptions({ brandIconUrl }) {
+export function gameOptions({ isApple, brandIconUrl }) {
   return {
-    id: 'obsidian', layout: 'container', brandIconUrl,
+    id: 'obsidian', layout: 'container', brandIconUrl, isApple,
     recordsKey: `${STORAGE_PREFIX}.game.records.v1`,
     audioKeys: { effects: `${STORAGE_PREFIX}.game.audio.v1`, keyboard: `${STORAGE_PREFIX}.sound.v1` },
   };

@@ -234,11 +234,9 @@ export const CSS = `
 .tp-char.wrong {
   color: var(--tf-state-error-primary);
   text-decoration: underline;
-  text-decoration-thickness: 2px;
-  text-underline-offset: 3px;
 }
 .tp-root {
-  --tp-font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  --tp-font-mono: SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
   --tp-cursor-color: var(--tf-brand-primary-new-colorprimary-new-color, #4176e6);
 }
 .tp-char.caret { position: relative; }
@@ -368,7 +366,7 @@ export const CSS = `
 .tp-action { position: relative; display: inline-flex; }
 .tp-shortcut-tip { position: absolute; left: 50%; bottom: calc(100% + 8px); z-index: 10; padding: 5px 9px; border: 1px solid var(--tf-border-l1); border-radius: 6px; background: var(--tf-bg-layer-2); color: var(--tf-label-primary); font-size: 11.5px; white-space: nowrap; visibility: hidden; opacity: 0; transform: translate(-50%, 4px); pointer-events: none; transition: opacity 120ms ease-out, transform 120ms ease-out, visibility 120ms; }
 .tp-action .tp-btn:focus-visible + .tp-shortcut-tip { visibility: visible; opacity: 1; transform: translate(-50%, 0); transition: none; }
-.tp-option-group:has(.tp-seg-btn:focus-visible) > .tp-shortcut-tip { visibility: visible; opacity: 1; transform: translate(-50%, 0); transition: none; }
+.tp-seg-btn:focus-visible ~ .tp-shortcut-tip { visibility: visible; opacity: 1; transform: translate(-50%, 0); transition: none; }
 .tp-instructions { display: grid; min-width: 0; flex: 1; font-size: 11.5px; line-height: 18px; }
 .tp-btn {
   display: inline-flex;
@@ -459,13 +457,13 @@ export const CSS = `
 .tp-pinyin-controls .tp-sound-field { grid-template-columns: 64px minmax(0, 1fr); gap: 12px; }
 .tp-pinyin-preview { display: flex; justify-content: center; align-items: center; gap: 6px; min-width: 0; font-size: 24px; }
 .tp-pinyin-note { margin: 0; color: var(--tf-label-secondary); font-size: 12px; line-height: 1.7; }
-.tp-sound-field:has(select:disabled) { opacity: .5; }
+.tp-sound-field.is-disabled { opacity: .5; }
 .tp-sound-status > span { grid-area: 1 / 1; }
 .tp-sound-credit { font-size: 11px; color: var(--tf-label-secondary); text-underline-offset: 3px; }
 .tp-cursor-layout, .tp-pinyin-layout { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 24px; align-items: stretch; }
 .tp-cursor-controls, .tp-pinyin-controls { display: grid; gap: 12px; min-width: 0; }
 .tp-cursor-controls .tp-sound-field { grid-template-columns: 48px minmax(0, 1fr); gap: 12px; }
-.tp-cursor-preview { display: flex; justify-content: center; align-items: center; min-width: 0; margin: 0; border-radius: 8px; background: var(--tf-bg-layer-2); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 26px; line-height: 1.25; }
+.tp-cursor-preview { display: flex; justify-content: center; align-items: center; min-width: 0; margin: 0; border-radius: 8px; background: var(--tf-bg-layer-2); font-family: SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-size: 26px; line-height: 1.25; }
 .tp-cursor-preview-text { white-space: pre; }
 .tp-cursor-toggles { display: grid; gap: 12px; }
 .tp-cursor-toggle { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 44px; font-size: 13px; cursor: pointer; }

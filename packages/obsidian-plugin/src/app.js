@@ -22,9 +22,10 @@ function createPages(service) {
   const { Context, Navigation } = createModeNavigation(React);
   const fetchCorpus = createVaultCorpus({ getFolders: service.folders.list, listFiles: service.listFiles, read: service.read });
   const Settings = createFolderSettings(React, service.folders);
+  const isApple = service.isApple ?? false;
   const { TypingPage, startWithText } = createPractice(React,
-    practiceOptions({ locale, brandIconUrl, Navigation, loadPronunciation, loadAudio, fetchCorpus, Settings }));
-  const GamePage = createGamePage(React, gameOptions({ brandIconUrl }));
+    practiceOptions({ isApple, locale, brandIconUrl, Navigation, loadPronunciation, loadAudio, fetchCorpus, Settings }));
+  const GamePage = createGamePage(React, gameOptions({ isApple, brandIconUrl }));
   const language = locale.getLocale().active;
   let storage;
   try { storage = window.localStorage; } catch { /* Shared storage functions handle unavailable storage. */ }

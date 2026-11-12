@@ -49,7 +49,7 @@ function loadPlugin(code, language = 'zh', data = null) {
   class Setting {}
   class Notice {}
   class TFolder {}
-  const obsidian = { ItemView, Plugin, PluginSettingTab, FuzzySuggestModal, Scope, Setting, Notice, TFolder, getLanguage: () => language };
+  const obsidian = { ItemView, Plugin, PluginSettingTab, FuzzySuggestModal, Scope, Setting, Notice, TFolder, Platform: { isMacOS: true, isIosApp: false }, getLanguage: () => language };
   const module = { exports: {} };
   const context = { module, exports: module.exports, require: name => {
     assert.equal(name, 'obsidian', `unexpected runtime require: ${name}`);
@@ -69,6 +69,12 @@ test('Obsidian package ships the three installable files with a valid manifest',
   assert.equal(manifest.isDesktopOnly, false);
   const css = await readFile(dist + 'styles.css', 'utf8');
   assert.ok(css.endsWith(obsidianStyles(practiceCSS + gameCSS)));
+  assert.ok(!css.includes('!important'), 'no !important in styles.css');
+  assert.ok(!css.includes(':has('), 'no :has() in styles.css');
+  assert.ok(!css.includes('ui-monospace'), 'no ui-monospace in styles.css');
+  assert.ok(!css.includes('text-decoration-thickness'), 'no text-decoration-thickness in styles.css');
+  const js = await readFile(dist + 'main.js', 'utf8');
+  assert.ok(!/createElement\s*\(\s*['"]script['"]\s*\)/.test(js), 'no createElement("script") in main.js');
 });
 
 test('Obsidian release files agree with the manifest', async () => {

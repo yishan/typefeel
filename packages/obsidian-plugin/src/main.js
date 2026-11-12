@@ -1,4 +1,4 @@
-import { FuzzySuggestModal, ItemView, Notice, Plugin, PluginSettingTab, Scope, Setting, TFolder, getLanguage } from 'obsidian';
+import { FuzzySuggestModal, ItemView, Notice, Platform, Plugin, PluginSettingTab, Scope, Setting, TFolder, getLanguage } from 'obsidian';
 import { HOST_CLASS, VIEW_TYPE, commandNames, interfaceLanguage, normalizeMode, reservesGamePause } from './platform.js';
 import { normalizeFolder, parseSettings, removeFolder, renameFolder } from './folders.js';
 
@@ -129,6 +129,7 @@ export default class TypefeelPlugin extends Plugin {
     const { vault } = this.app;
     const exists = path => path === '' || vault.getFolderByPath(path) != null;
     return {
+      isApple: Platform.isMacOS || Platform.isIosApp,
       languageId: getLanguage(),
       listFiles: () => vault.getMarkdownFiles().map(file => ({ path: file.path, basename: file.basename, mtime: file.stat.mtime, file })),
       read: item => vault.cachedRead(item.file),

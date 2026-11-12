@@ -1,5 +1,10 @@
 // Shared by the web mount and platform contract tests. No DSH globals or API.
 export const webOptions = {
+  get isApple() {
+    return typeof window !== 'undefined'
+      ? /Mac|iPhone|iPad|iPod/i.test(window.navigator?.userAgentData?.platform || window.navigator?.platform || '')
+      : (typeof navigator !== 'undefined' && /Mac|iPhone|iPad|iPod/i.test(navigator.userAgentData?.platform || navigator.platform || ''));
+  },
   storagePrefix: 'typefeel.practice',
   fullShortcuts: false,
   brandIconUrl: '/brand/icons/icon.svg',

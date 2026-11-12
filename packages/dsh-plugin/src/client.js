@@ -29,8 +29,9 @@ export function createPlugin(React, loadChunk) {
         } catch { /* Fall back to bundled copy. */ }
         try { translate = locale.bind('typing-practice'); } catch { /* Optional host service. */ }
       }
+      const isApple = typeof window !== 'undefined' && /Mac|iPhone|iPad|iPod/i.test(window.navigator?.userAgentData?.platform || window.navigator?.platform || '');
       const { TypingPage, PanelIcon, CSS, t } = createPractice(React, {
-        id: 'dsh', Navigation,
+        id: 'dsh', Navigation, isApple,
         storagePrefix: 'dsh.typing-practice', locale, translate,
         brandIconUrl,
         SettingsFooter,
@@ -46,7 +47,7 @@ export function createPlugin(React, loadChunk) {
         },
       });
       const GamePage = createGamePage(React, {
-        id: 'dsh', layout: 'container', brandIconUrl,
+        id: 'dsh', layout: 'container', brandIconUrl, isApple,
         recordsKey: 'dsh.typing-practice.game.records.v1',
         audioKeys: { effects: 'dsh.typing-practice.game.audio.v1', keyboard: 'dsh.typing-practice.sound.v1' },
         shortcuts: () => ctx.get('shortcuts'),
