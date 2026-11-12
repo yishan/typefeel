@@ -1,4 +1,4 @@
-# Type Feel for Obsidian
+# Typefeel for Obsidian
 
 **English** | [简体中文](README.zh-CN.md)
 
@@ -18,7 +18,7 @@ Built from [typefeel](https://github.com/yishan/typefeel), the same source as [t
 ## Use
 
 - Click the keyboard icon in the ribbon, or run **Open typing practice** or **Open falling words game** from the command palette.
-- To practice your own notes, add folders under **Settings → Type Feel → Note folders**, or in the Type Feel settings dialog. Then choose **My notes** as the text source. Until you add a folder, no notes are read.
+- To practice your own notes, add folders under **Settings → Typefeel → Note folders**, or in the Typefeel settings dialog. Then choose **My notes** as the text source. Until you add a folder, no notes are read.
 - To practice part of a note, select the text and run **Practice typing the selection** from the command palette or the editor's context menu.
 
 Commands have no default hotkeys; you can assign your own under **Settings → Hotkeys**.

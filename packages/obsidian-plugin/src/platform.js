@@ -31,7 +31,7 @@ export const copy = {
     corpusUnconfigured: '请先在设置中选择用于练习的笔记文件夹，已使用默认语料。',
   },
   en: {
-    panelTitle: 'Type Feel',
+    panelTitle: 'Typefeel',
     panelSubtitle: 'Chinese, Cantonese and English typing practice, with live speed and accuracy.',
     corpusFooter: '',
     settingsLocalTextNote: 'My notes reads notes in the folders you choose, on this device, for this practice run only. Nothing is uploaded or copied. Settings and scores are saved only on this device.',
@@ -45,7 +45,7 @@ export const copy = {
 export const commandNames = {
   zh: { ribbon: '打开字感', practice: '打开打字练习', game: '打开落字游戏', selection: '用选中内容练习打字',
     noSelection: '请先选中要练习的文字。', unsuitable: '选中的内容不适合练习：需要至少一句可以输入的中文、粤语或英文。' },
-  en: { ribbon: 'Open Type Feel', practice: 'Open typing practice', game: 'Open falling words game', selection: 'Practice typing the selection',
+  en: { ribbon: 'Open Typefeel', practice: 'Open typing practice', game: 'Open falling words game', selection: 'Practice typing the selection',
     noSelection: 'Select the text you want to practice first.', unsuitable: 'This selection cannot be practiced. Select at least one typeable sentence in Chinese, Cantonese or English.' },
 };
 

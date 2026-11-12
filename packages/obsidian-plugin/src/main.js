@@ -26,7 +26,7 @@ class TypefeelView extends ItemView {
   }
 
   getViewType() { return VIEW_TYPE; }
-  getDisplayText() { return this.plugin.language === 'zh' ? '字感' : 'Type Feel'; }
+  getDisplayText() { return this.plugin.language === 'zh' ? '字感' : 'Typefeel'; }
   getIcon() { return 'keyboard'; }
   getState() { return { ...super.getState(), mode: this.mode }; }
 
