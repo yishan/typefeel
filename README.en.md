@@ -41,13 +41,17 @@ See the [difficulty, layout and audio verification](docs/verification/2026-11-09
 
 The app includes **288 original passages**: 96 per language, with 32 short, 32 medium and 32 long passages. Text, pronunciation dictionaries and sounds ship with the app. Practice does not call a model or upload what you type. Settings and statistics stay in your browser; clearing site data also clears them.
 
-The website uses built-in passages. The DSH plugin can additionally select recent conversations from the current local DSH profile. Website and plugin records are separate and do not sync automatically. Initial access requires a network connection; offline installation is not included in this release.
+The website uses built-in passages. The DSH plugin can additionally select recent conversations from the current local DSH profile, and the Obsidian plugin can use notes from folders you choose. Website and plugin records are separate and do not sync automatically. Initial access requires a network connection; offline installation is not included in this release.
 
 ## DSH plugin
 
 This repository also builds [dsh-typing-practice](https://github.com/yishan/dsh-typing-practice) from the same practice source. The plugin keeps its existing GitHub and npm installation paths, local conversation access and platform shortcuts.
 
 The plugin provides the same Practice / Game switch from version 0.2.0. The game fits the DSH panel, follows its language and theme, shares keyboard sound settings with practice inside DSH, and stores game records separately. See the [plugin guide](packages/dsh-plugin/README.en.md).
+
+## Obsidian plugin
+
+`packages/obsidian-plugin` brings the same practice and falling words game to an Obsidian tab, following Obsidian's language and theme. You can practice notes from folders you choose, or a selection in the editor. It makes no network requests and reads no notes until you choose a folder. The plugin is in testing and will first be installable with BRAT from the distribution repository `yishan/typefeel-obsidian`. See the [plugin guide](packages/obsidian-plugin/README.md).
 
 ## Run locally
 

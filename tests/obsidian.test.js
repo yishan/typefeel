@@ -18,7 +18,20 @@ const source = fileURLToPath(new URL('../packages/obsidian-plugin/', import.meta
 function loadPlugin(code, language = 'zh', data = null) {
   const registered = { views: [], commands: [], ribbons: [], events: [], settingTabs: [] };
   class Component { registerEvent(ref) { registered.events.push(ref); } }
-  class ItemView extends Component { constructor(leaf) { super(); this.leaf = leaf; } getState() { return {}; } async setState() {} }
+  class ItemView extends Component { constructor(leaf) { super(); this.leaf = leaf; this.app = leaf.app; } getState() { return {}; } async setState() {} }
+  // Mirrors Obsidian's Scope.handleKey: a keyed handler always ends the search;
+  // a catch-all handler returning undefined defers to the parent scope.
+  class Scope {
+    constructor(parent) { this.parent = parent; this.keys = []; }
+    register(modifiers, key, func) { const handler = { modifiers, key, func }; this.keys.push(handler); return handler; }
+    handleKey(event, info) {
+      for (const handler of this.keys) {
+        const result = handler.func(event, info);
+        if (result !== undefined || handler.key !== null || handler.modifiers !== null) return result;
+      }
+      return this.parent?.handleKey(event, info);
+    }
+  }
   class Plugin extends Component {
     constructor() {
       super();
@@ -36,7 +49,7 @@ function loadPlugin(code, language = 'zh', data = null) {
   class Setting {}
   class Notice {}
   class TFolder {}
-  const obsidian = { ItemView, Plugin, PluginSettingTab, FuzzySuggestModal, Setting, Notice, TFolder, getLanguage: () => language };
+  const obsidian = { ItemView, Plugin, PluginSettingTab, FuzzySuggestModal, Scope, Setting, Notice, TFolder, getLanguage: () => language };
   const module = { exports: {} };
   const context = { module, exports: module.exports, require: name => {
     assert.equal(name, 'obsidian', `unexpected runtime require: ${name}`);
@@ -58,6 +71,20 @@ test('Obsidian package ships the three installable files with a valid manifest',
   assert.ok(css.endsWith(obsidianStyles(practiceCSS + gameCSS)));
 });
 
+test('Obsidian release files agree with the manifest', async () => {
+  const manifest = JSON.parse(await readFile(source + 'manifest.json', 'utf8'));
+  const versions = JSON.parse(await readFile(source + 'versions.json', 'utf8'));
+  assert.equal(versions[manifest.version], manifest.minAppVersion, 'versions.json maps each release to its minimum app version');
+  for (const file of ['README.md', 'README.zh-CN.md']) {
+    const readme = await readFile(source + file, 'utf8');
+    assert.match(readme, /yishan\/typefeel-obsidian/);
+    assert.match(readme, /github\.com\/yishan\/typefeel\)/, `${file} links the source repository`);
+    assert.ok(readme.includes(manifest.minAppVersion), `${file} states the minimum Obsidian version`);
+  }
+  const pkg = JSON.parse(await readFile(fileURLToPath(new URL('../package.json', import.meta.url)), 'utf8'));
+  assert.equal(pkg.scripts['export:obsidian'], 'node scripts/export-obsidian.mjs');
+});
+
 test('loading the Obsidian plugin evaluates only the shell and registers a view, ribbon and commands', async () => {
   const code = await readFile(dist + 'main.js', 'utf8');
   // No window or document here: the React app must not run until a view opens.
@@ -74,10 +101,53 @@ test('loading the Obsidian plugin evaluates only the shell and registers a view,
   assert.equal(registered.settingTabs.length, 1);
   assert.deepEqual({ ...plugin.settings, folders: [...plugin.settings.folders] }, { version: 1, folders: ['Notes'] });
   assert.deepEqual(registered.ribbons.map(ribbon => [ribbon.icon, ribbon.title]), [['keyboard', platform.commandNames.zh.ribbon]]);
-  const view = registered.views[0].create({});
+  const view = registered.views[0].create({ app: {} });
   assert.equal(view.getViewType(), platform.VIEW_TYPE);
   assert.equal(view.getDisplayText(), '字感');
   assert.deepEqual({ ...view.getState() }, { mode: 'practice' });
+});
+
+// A minimal element tree: the game root, a focused element and an optional dialog.
+function gameTree(status, { focused = 'input', dialog = false } = {}) {
+  const input = { closest: selector => selector === 'dialog[open]' && dialog ? {} : null };
+  const outside = { closest: () => null };
+  const root = { dataset: { status }, contains: node => node === input };
+  return { root, active: focused === 'input' ? input : outside };
+}
+
+test('the view scope keeps Cmd/Ctrl+P from the command palette only while a focused game runs', async () => {
+  const mod = { key: 'p', code: 'KeyP', metaKey: true, ctrlKey: false, altKey: false, shiftKey: false };
+  for (const status of ['running', 'countdown']) {
+    const { root, active } = gameTree(status);
+    assert.equal(platform.reservesGamePause(mod, root, active), true, status);
+    assert.equal(platform.reservesGamePause({ ...mod, metaKey: false, ctrlKey: true }, root, active), true, `${status} Ctrl+P`);
+  }
+  for (const status of ['ready', 'paused', 'ended']) {
+    const { root, active } = gameTree(status);
+    assert.equal(platform.reservesGamePause(mod, root, active), false, `${status} leaves the palette available`);
+  }
+  const running = gameTree('running');
+  assert.equal(platform.reservesGamePause(mod, null, running.active), false, 'practice mode has no game root');
+  assert.equal(platform.reservesGamePause(mod, running.root, gameTree('running', { focused: 'outside' }).active), false, 'focus outside the game');
+  assert.equal(platform.reservesGamePause(mod, running.root, gameTree('running', { dialog: true }).active), false, 'settings dialog open');
+  assert.equal(platform.reservesGamePause({ ...mod, isComposing: true }, running.root, running.active), false, 'IME composition');
+  assert.equal(platform.reservesGamePause({ ...mod, keyCode: 229 }, running.root, running.active), false, 'IME process key');
+  for (const extra of [{ shiftKey: true }, { altKey: true }, { ctrlKey: true }, { metaKey: false }, { key: 'o', code: 'KeyO' }]) {
+    assert.equal(platform.reservesGamePause({ ...mod, ...extra }, running.root, running.active), false, JSON.stringify(extra));
+  }
+
+  // Through the built view: a running game blocks the parent (palette) scope;
+  // other keys and other states fall through to it.
+  const { Plugin, registered } = loadPlugin(await readFile(dist + 'main.js', 'utf8'), 'en');
+  await new Plugin().onload();
+  const appScope = { handleKey: () => 'palette' };
+  const view = registered.views[0].create({ app: { scope: appScope } });
+  let tree = gameTree('running');
+  view.contentEl = { querySelector: selector => selector === '.tf-game-root' ? { ...tree.root, ownerDocument: { activeElement: tree.active } } : null };
+  assert.equal(view.scope.handleKey(mod, {}), false);
+  assert.equal(view.scope.handleKey({ ...mod, key: 'o', code: 'KeyO' }, {}), 'palette');
+  tree = gameTree('paused');
+  assert.equal(view.scope.handleKey(mod, {}), 'palette');
 });
 
 test('Obsidian interface languages map to Chinese or English', () => {

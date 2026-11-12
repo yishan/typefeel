@@ -9,6 +9,7 @@
 | `packages/practice/src` | 共同练习与游戏、输入、计时、判分、视区、记录、注音、音效与样式 |
 | `apps/web` | 网页入口、品牌、浏览器语言与主题、模式导航 |
 | `packages/dsh-plugin` | DSH 模块、侧栏、语言与主题接入、快捷键、面板布局、本地对话 |
+| `packages/obsidian-plugin` | Obsidian 视图、命令、主题、视图快捷键作用域、按文件夹选取的笔记语料 |
 | `data` / `assets` | 三语原创语料、经过校验的键盘录音与许可 |
 
 `createPractice(React, platform)` 每次调用创建独立的缓存与界面实例。
@@ -25,8 +26,8 @@ npm run build
 npm test
 ```
 
-构建会校验语料和音频校验和，输出 `dist/web` 与 `dist/dsh-plugin`。
-`dist/build-inputs.json` 记录两端真实构建输入；测试确认两端使用同一份练习模块。
+构建会校验语料和音频校验和，输出 `dist/web`、`dist/dsh-plugin` 与 `dist/obsidian-plugin`。
+`dist/build-inputs.json` 记录各端真实构建输入；测试确认各端使用同一份练习模块，且互不引入其他适配层。
 原插件的时限、IME 组字、记录迁移、本地语料和音效回归测试针对生成的插件运行。
 网页测试覆盖平台差异、原生浏览器快捷键、存储隔离与静态资产。
 
@@ -59,3 +60,28 @@ GitHub 安装仍应直接使用自包含产物，不要求安装者构建或具�
 网页与插件可以独立发布，不做双向 Git 自动合并。
 
 GitHub Release 与 npm 使用同一份经过审阅的打包产物。发布后核对 GitHub tag、`SOURCE.json`、npm 版本与 `latest`，并比较下载产物的完整性。
+
+## Obsidian 插件同步
+
+插件 id 为 `typefeel`（发布后不可更改），存储键前缀为 `typefeel.obsidian`，
+最低 Obsidian 版本见 `packages/obsidian-plugin/manifest.json` 的 `minAppVersion`。
+分发仓库为 `yishan/typefeel-obsidian`，只包含发布产物，不在本仓库直接发布。
+
+发布时先修改 `packages/obsidian-plugin/manifest.json` 的版本，并在同目录的
+`versions.json` 中加入「插件版本 → 最低 Obsidian 版本」，提交后运行：
+
+```bash
+npm run export:obsidian -- /tmp/typefeel-obsidian-release
+```
+
+规则与 DSH 导出相同：目录须不存在或为空，源码须干净，脚本重新构建并运行完整测试。
+输出包含 `main.js`、`manifest.json`、`styles.css`、`README.md`、`README.zh-CN.md`、
+`versions.json`、`LICENSE`、`THIRD_PARTY_NOTICES.md` 和 `SOURCE.json`。
+
+GitHub Release 须附带 `main.js`、`manifest.json`、`styles.css`，tag、Release 名称与
+`manifest.json` 版本一致。测试阶段只发布 `x.y.z-beta.N` 预发布版本供 BRAT 安装，
+不把默认分支根目录 `manifest.json` 的版本改为新版本；正式版再提交根目录 `manifest.json`
+并到 community.obsidian.md 提交。建仓库、发 Release、提交目录都对外可见，须另行确认。
+
+本地调试可把测试笔记库的 `.obsidian/plugins/typefeel` 软链接到 `dist/obsidian-plugin`，
+构建后在 Obsidian 中停用再启用插件。不要使用日常笔记库测试。

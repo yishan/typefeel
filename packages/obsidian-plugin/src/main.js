@@ -1,5 +1,5 @@
-import { FuzzySuggestModal, ItemView, Notice, Plugin, PluginSettingTab, Setting, TFolder, getLanguage } from 'obsidian';
-import { HOST_CLASS, VIEW_TYPE, commandNames, interfaceLanguage, normalizeMode } from './platform.js';
+import { FuzzySuggestModal, ItemView, Notice, Plugin, PluginSettingTab, Scope, Setting, TFolder, getLanguage } from 'obsidian';
+import { HOST_CLASS, VIEW_TYPE, commandNames, interfaceLanguage, normalizeMode, reservesGamePause } from './platform.js';
 import { normalizeFolder, parseSettings, removeFolder, renameFolder } from './folders.js';
 
 const settingsCopy = {
@@ -16,6 +16,13 @@ class TypefeelView extends ItemView {
     this.mode = 'practice';
     this.dispose = null;
     this.navigation = true;
+    // Active only while this view is focused. A catch-all handler that returns
+    // undefined passes every other key on to Obsidian's own scopes.
+    this.scope = new Scope(this.app.scope);
+    this.scope.register(null, null, event => {
+      const root = this.contentEl.querySelector('.tf-game-root');
+      if (reservesGamePause(event, root, root?.ownerDocument.activeElement)) return false;
+    });
   }
 
   getViewType() { return VIEW_TYPE; }

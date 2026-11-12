@@ -67,3 +67,15 @@ export function gameOptions({ brandIconUrl }) {
 export function normalizeMode(mode) {
   return MODES.includes(mode) ? mode : 'practice';
 }
+
+// Cmd/Ctrl+P opens Obsidian's command palette. While a game is running or
+// counting down in this view, the shared game listener pauses on that chord, so
+// the view scope keeps it from also reaching the palette. Paused, ready and
+// ended games, open dialogs and IME composition leave the palette available.
+export function reservesGamePause(event, root, active) {
+  const chord = (event.key?.toLowerCase() === 'p' || event.code === 'KeyP')
+    && Boolean(event.metaKey) !== Boolean(event.ctrlKey) && !event.altKey && !event.shiftKey;
+  if (!chord || !root || event.isComposing || event.keyCode === 229) return false;
+  return ['running', 'countdown'].includes(root.dataset?.status)
+    && Boolean(active) && root.contains(active) && !active.closest?.('dialog[open]');
+}

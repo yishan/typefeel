@@ -70,3 +70,33 @@
 
 - 大型笔记库（上千篇笔记）的选段耗时未测；代码限制为最多 200 篇、20 万字符，并逐篇让出主线程。
 - 手机端、真实输入法、DSH 宿主回归，同第二阶段。
+
+
+# 第四阶段：快捷键 Scope 与导出分发
+
+日期：2026-11-12。同一测试实例和临时笔记库。
+
+## 自动检查
+
+- `npm run build`、`npm test`：279 项全部通过。
+- 新增 `tests/obsidian.test.js` 用例：
+  - `the view scope keeps Cmd/Ctrl+P from the command palette only while a focused game runs`：覆盖 running / countdown / paused / ready / ended 状态、焦点在游戏内外、设置弹窗打开、IME 组字等场景。
+  - `Obsidian release files agree with the manifest`：校验 `versions.json` 版本映射、中英 README 链接与版本说明、`package.json` 中的 `export:obsidian` 命令。
+- 导出脚本验证：
+  - `scripts/release.mjs` 提取公共前置检查（外部目录、干净工作区、全新构建与全量测试）。
+  - `scripts/export-obsidian.mjs` 输出到暂存目录：`main.js`、`manifest.json`、`styles.css`、`README.md`、`README.zh-CN.md`、`versions.json`、`LICENSE`、`THIRD_PARTY_NOTICES.md` 与记录源 commit 的 `SOURCE.json`。
+  - DSH 原有 `npm run export:plugin` 行为保持不变。
+
+## 实机检查结果
+
+| 项目 | 结果 |
+|---|---|
+| 游戏运行中（`running`）且获焦时按 Cmd/Ctrl+P | 游戏暂停，**不打开** Obsidian 命令面板（由 View Scope 拦截并阻止默认行为） |
+| 游戏暂停中（`paused`）按 Cmd/Ctrl+P | 正常打开 Obsidian 命令面板 |
+| 练习模式中按 Cmd/Ctrl+P | 正常打开 Obsidian 命令面板 |
+| 游戏中按 Esc | 正常暂停 |
+
+## 未覆盖
+
+- 手机端真机验证（目前 `isDesktopOnly: false`，真机未测）。
+- 真实物理中文/粤语输入法候选窗位置（模拟 CDP 验证已通过，需人工最终确认）。
